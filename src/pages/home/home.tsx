@@ -7,9 +7,11 @@ import {
   Heading,
   Spacer,
   Text,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import { IUser } from "../../utility/interface";
-import { IconPlus } from "@tabler/icons-react";
+import { IconPlus, IconMessage2 } from "@tabler/icons-react";
 import { COLORS } from "../../utility/colors";
 import { useEffect, useState } from "react";
 import {
@@ -17,13 +19,19 @@ import {
   HttpError,
   useGetIdentity,
   useNavigation,
+  useParsed,
 } from "@refinedev/core";
 import { ProjectCard } from "../../components/project-card";
 import PublicCard from "../../components/public-card";
 import PublicProjectModal from "../../components/public-project-modal";
 import { useNavigate } from "react-router-dom";
+import Chat from "../../components/chat/chat";
 
 export function Home() {
+  const { params } = useParsed();
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chats, setChats] = useState<any>([]);
+
   const { push } = useNavigation();
   const { data: user } = useGetIdentity<IUser>();
   const [personalStash, setPersonalStash] = useState<any[]>([]);
@@ -50,44 +58,79 @@ export function Home() {
     }
   }, [projects, user?.id]);
 
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
+
   return (
     <Box bg={COLORS.white} padding={4}>
       <div>
         <Heading as="h4" size="md" py={6}>
           Welcome back, {user?.email}
         </Heading>
-        <Flex gap="4">
-          <Card>
-            <CardHeader>
-              <Text fontSize={"lg"} color={COLORS.greyNeutral500} as="b">
-                Your active projects
-              </Text>
-            </CardHeader>
-            <CardBody>
-              <Text fontSize={"4xl"} as="b">
-                {personalStash?.length || 0}
-              </Text>
-            </CardBody>
-          </Card>
+        <Flex gap="35%">
+          <Flex gap="4">
+            <Card>
+              <CardHeader>
+                <Text fontSize={"lg"} color={COLORS.greyNeutral500} as="b">
+                  Your active projects
+                </Text>
+              </CardHeader>
+              <CardBody>
+                <Text fontSize={"4xl"} as="b">
+                  {personalStash?.length || 0}
+                </Text>
+              </CardBody>
+            </Card>
 
-          <Card
-            backgroundColor={COLORS.primaryColor}
-            color={"white"}
-            alignItems={"center"}
-            justifyContent={"center"}
-            padding={4}
-            flexWrap={"nowrap"}
-            flexDirection={"row"}
+            <Card
+              backgroundColor={COLORS.primaryColor}
+              color={"white"}
+              alignItems={"center"}
+              justifyContent={"center"}
+              padding={4}
+              flexWrap={"nowrap"}
+              flexDirection={"row"}
+              cursor={"pointer"}
+              fontSize={"lg"}
+              onClick={() => push("/projects/create")}
+            >
+              <IconPlus />
+              Create a new project
+            </Card>
+          </Flex>
+          <Chat
+            isOpen={chatOpen}
+            onClose={() => setChatOpen(false)}
+            projectId={params?.projectId}
+            chats={chats}
+            setChats={setChats}
+          />
+
+          <Tag
+            mt="30px"
+            color={COLORS.white}
+            width="300px"
+            height="100px"
+            background={COLORS.primaryColor}
             cursor={"pointer"}
             fontSize={"lg"}
-            onClick={() => push("/projects/create")}
+            borderRadius={"xl"}
+            onClick={() => setChatOpen(true)}
+            padding={4}
           >
-            <IconPlus />
-            Create a new project
-          </Card>
+            <IconMessage2 />
+            <TagLabel ml={2}>
+              Chat with us for travel tips
+              {chats?.length ? chats?.length : null}
+            </TagLabel>
+          </Tag>
         </Flex>
       </div>
       <Spacer height={14} />
+
       <div>
         <Flex flexDirection={"column"}>
           <Text fontSize="2xl" mb="4" as="b">
