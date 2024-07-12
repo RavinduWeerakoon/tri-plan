@@ -1,161 +1,225 @@
-import {
-  Authenticated,
-  AuthPage,
-  ErrorComponent,
-  GitHubBanner,
-  Refine,
-} from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
+import { Authenticated, Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-
+import {
+  notificationProvider,
+  RefineThemes,
+  ThemedLayoutV2,
+  ThemedTitleV2,
+} from "@refinedev/chakra-ui";
+import { Box, ChakraProvider, extendTheme } from "@chakra-ui/react";
 import routerBindings, {
   CatchAllNavigate,
   DocumentTitleHandler,
-  NavigateToResource,
-  UnsavedChangesNotifier,
 } from "@refinedev/react-router-v6";
 import { dataProvider, liveProvider } from "@refinedev/supabase";
+import { useTranslation } from "react-i18next";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
-import "./App.css";
 import authProvider from "./authProvider";
-import { Layout } from "./components/layout";
-import {
-  BlogPostCreate,
-  BlogPostEdit,
-  BlogPostList,
-  BlogPostShow,
-} from "./pages/blog-posts";
-import {
-  CategoryCreate,
-  CategoryEdit,
-  CategoryList,
-  CategoryShow,
-} from "./pages/categories";
+import { ProjectCreate, ProjectEdit, Projects } from "./pages/projects";
 import { supabaseClient } from "./utility";
+import { ForgotPassword, Login, Register, ResetPassword } from "./pages/auth";
+import {
+  ItineraryCreate,
+  ItineraryEdit,
+  ItineraryList,
+  ItineraryShow,
+} from "./pages/itineraries";
+import { Landing } from "./pages/landing";
+import { Invite } from "./pages/projects/invite";
+import { Home } from "./pages/home";
+import { CustomSidebar } from "./components/custom-sidebar/custom-sidebar";
+import { ErrorPage } from "./pages/error-404/error";
+import { FinalPlan } from "./pages/final-plan/final-plan";
+import { Logo } from "./assets/logo";
+import { useEffect } from "react";
+import "@fontsource/catamaran/400.css";
+import "@fontsource/catamaran/700.css";
 
 function App() {
+  const { t, i18n } = useTranslation();
+
+  useEffect(() => {
+    localStorage.setItem("chakra-ui-color-mode", "light");
+  }, []);
+
+  const customTheme = extendTheme({
+    ...RefineThemes.Magenta,
+    config: {
+      initialColorMode: "light",
+      useSystemColorMode: false,
+    },
+    fonts: {
+      heading: `'Catamaran', sans-serif`,
+      body: `'Catamaran', sans-serif`,
+    },
+  });
+
+  const i18nProvider = {
+    translate: (key: string, params: object) => t(key, params),
+    changeLocale: (lang: string) => i18n.changeLanguage(lang),
+    getLocale: () => i18n.language,
+  };
+
   return (
     <BrowserRouter>
-      <GitHubBanner />
       <RefineKbarProvider>
-        <DevtoolsProvider>
+        <ChakraProvider theme={customTheme}>
           <Refine
             dataProvider={dataProvider(supabaseClient)}
             liveProvider={liveProvider(supabaseClient)}
             authProvider={authProvider}
             routerProvider={routerBindings}
+            notificationProvider={notificationProvider}
+            i18nProvider={i18nProvider}
             resources={[
               {
-                name: "blog_posts",
-                list: "/blog-posts",
-                create: "/blog-posts/create",
-                edit: "/blog-posts/edit/:id",
-                show: "/blog-posts/show/:id",
+                name: "projects",
+                list: "/projects",
+                create: "/projects/create",
+                edit: "/projects/edit/:id",
                 meta: {
                   canDelete: true,
                 },
               },
               {
-                name: "categories",
-                list: "/categories",
-                create: "/categories/create",
-                edit: "/categories/edit/:id",
-                show: "/categories/show/:id",
-                meta: {
-                  canDelete: true,
-                },
+                name: "itineraries",
+                list: "/:projectId/itinerary",
+                create: "/:projectId/itinerary/create",
+                edit: "/:projectId/itinerary/edit/:id",
+                show: "/:projectId/itinerary/show/:id",
               },
             ]}
             options={{
               syncWithLocation: true,
               warnWhenUnsavedChanges: true,
-              useNewQueryKeys: true,
-              projectId: "2JQD0Y-HSWdKC-XkIa87",
             }}
           >
             <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route index path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/update-password" element={<ResetPassword />} />
               <Route
                 element={
-                  <Authenticated
-                    key="authenticated-inner"
-                    fallback={<CatchAllNavigate to="/login" />}
+                  <ThemedLayoutV2
+                    Header={() => <></>}
+                    Title={({ collapsed }) => (
+                      <ThemedTitleV2
+                        collapsed={collapsed}
+                        text="TripStash"
+                        icon={<Logo />}
+                      />
+                    )}
+                    Sider={() => <CustomSidebar />}
                   >
-                    <Layout>
+                    <Box ml={"28vh"}>
                       <Outlet />
-                    </Layout>
-                  </Authenticated>
+                    </Box>
+                  </ThemedLayoutV2>
                 }
               >
                 <Route
-                  index
-                  element={<NavigateToResource resource="blog_posts" />}
-                />
-                <Route path="/blog-posts">
-                  <Route index element={<BlogPostList />} />
-                  <Route path="create" element={<BlogPostCreate />} />
-                  <Route path="edit/:id" element={<BlogPostEdit />} />
-                  <Route path="show/:id" element={<BlogPostShow />} />
-                </Route>
-                <Route path="/categories">
-                  <Route index element={<CategoryList />} />
-                  <Route path="create" element={<CategoryCreate />} />
-                  <Route path="edit/:id" element={<CategoryEdit />} />
-                  <Route path="show/:id" element={<CategoryShow />} />
-                </Route>
-                <Route path="*" element={<ErrorComponent />} />
-              </Route>
-              <Route
-                element={
-                  <Authenticated
-                    key="authenticated-outer"
-                    fallback={<Outlet />}
-                  >
-                    <NavigateToResource />
-                  </Authenticated>
-                }
-              >
-                <Route
-                  path="/login"
+                  path="/home"
                   element={
-                    <AuthPage
-                      type="login"
-                      renderContent={(content) => (
-                        <div>
-                          <p
-                            style={{
-                              padding: 10,
-                              color: "#004085",
-                              backgroundColor: "#cce5ff",
-                              borderColor: "#b8daff",
-                              textAlign: "center",
-                            }}
-                          >
-                            email: info@refine.dev
-                            <br /> password: refine-supabase
-                          </p>
-                          {content}
-                        </div>
-                      )}
-                    />
+                    <Authenticated fallback={<CatchAllNavigate to="/login" />}>
+                      <Home />
+                    </Authenticated>
                   }
                 />
-                <Route
-                  path="/register"
-                  element={<AuthPage type="register" />}
-                />
-                <Route
-                  path="/forgot-password"
-                  element={<AuthPage type="forgotPassword" />}
-                />
+                <Route path="/projects">
+                  <Route
+                    index
+                    element={
+                      <Authenticated
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        <Projects />
+                      </Authenticated>
+                    }
+                  />
+                  <Route
+                    path="create"
+                    element={
+                      <Authenticated
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        <ProjectCreate />
+                      </Authenticated>
+                    }
+                  />
+                  <Route
+                    path="edit/:id"
+                    element={
+                      <Authenticated
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        <ProjectEdit />
+                      </Authenticated>
+                    }
+                  />
+                  <Route
+                    path="invite/:userId/:projectId"
+                    element={
+                      <Authenticated
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        <Invite />
+                      </Authenticated>
+                    }
+                  />
+                </Route>
+                <Route path="/:projectId/itinerary">
+                  <Route
+                    index
+                    element={
+                      <Authenticated
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        <ItineraryList />
+                      </Authenticated>
+                    }
+                  />
+                  <Route
+                    path="create"
+                    element={
+                      <Authenticated
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        <ItineraryCreate />
+                      </Authenticated>
+                    }
+                  />
+                  <Route
+                    path="edit/:id"
+                    element={
+                      <Authenticated
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        <ItineraryEdit />
+                      </Authenticated>
+                    }
+                  />
+                  <Route
+                    path="show/:id"
+                    element={
+                      <Authenticated
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        <ItineraryShow />
+                      </Authenticated>
+                    }
+                  />
+                </Route>
+                <Route path="/final-plan/:projectId" element={<FinalPlan />} />
+                <Route path="*" element={<ErrorPage />} />
               </Route>
             </Routes>
 
             <RefineKbar />
-            <UnsavedChangesNotifier />
             <DocumentTitleHandler />
           </Refine>
-          <DevtoolsPanel />
-        </DevtoolsProvider>
+        </ChakraProvider>
       </RefineKbarProvider>
     </BrowserRouter>
   );
