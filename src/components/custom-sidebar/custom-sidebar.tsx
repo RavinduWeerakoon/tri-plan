@@ -27,7 +27,7 @@ export const CustomSidebar: React.FC = () => {
           <Logo />
           <div>
             <Text fontSize="lg" ml={4} as="b">
-              TripStash
+              TriPlan
             </Text>
           </div>
         </Flex>
