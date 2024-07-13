@@ -39,7 +39,12 @@ import {
 } from "@chakra-ui/react";
 import { COLORS } from "../../utility/colors";
 import { IItinerary, IProject, IUser } from "../../utility/interface";
-import { IconHeart, IconLocation, IconMessage2, IconPlus } from "@tabler/icons-react";
+import {
+  IconHeart,
+  IconLocation,
+  IconMessage2,
+  IconPlus,
+} from "@tabler/icons-react";
 import InviteModal from "../../components/invite-modal";
 import { ITINERARY_STATUS } from "../../utility/constants";
 import Chat from "../../components/chat/chat";
