@@ -212,6 +212,7 @@ function App() {
                   />
                 </Route>
                 <Route path="/final-plan/:projectId" element={<FinalPlan />} />
+
                 <Route path="*" element={<ErrorPage />} />
               </Route>
             </Routes>
