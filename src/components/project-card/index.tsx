@@ -44,6 +44,7 @@ export const ProjectCard: React.FC<IProjectCard> = (props) => {
     collaborators,
     image_link,
   } = props;
+
   const getInviteUrl = () => {
     return document.URL + "/invite/" + user_id + "/" + id;
   };

@@ -54,6 +54,7 @@ export const Projects: React.FC = () => {
   });
 
   useEffect(() => {
+    console.log("success 0");
     if (projects) {
       const _personalStash = projects?.data?.filter((project: any) => {
         if (project?.user_id === user?.id) {
@@ -62,14 +63,36 @@ export const Projects: React.FC = () => {
       });
 
       const _collaboratorStash = projects?.data?.filter((project: any) => {
-        if (
-          project?.collaborators?.some(
-            (collaborator: any) => collaborator?.id === user?.id
-          )
-        ) {
-          return project;
+        console.log("Filtering project:", project.id);
+
+        // Check if collaborators is an array and process each item
+        if (Array.isArray(project?.collaborators)) {
+          // Check if any collaborator matches the user id
+          const isCollaborator = project.collaborators.some(
+            (collaboratorStr: string) => {
+              try {
+                // Parse JSON string to an object
+                const collaborator = JSON.parse(collaboratorStr);
+                // Check if the collaborator's id matches the user id
+                return collaborator?.id === user?.id;
+              } catch (error) {
+                console.error("Error parsing collaborator JSON:", error);
+                return false; // Skip this collaborator if parsing fails
+              }
+            }
+          );
+
+          if (isCollaborator) {
+            console.log("Project included:", project.id);
+            return true;
+          }
         }
+
+        // Exclude this project if no collaborators match
+        return false;
       });
+
+      console.log("Filtered projects:", _collaboratorStash);
 
       setPersonalStash(_personalStash);
       setCollaboratorStash(_collaboratorStash);
