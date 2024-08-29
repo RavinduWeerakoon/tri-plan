@@ -55,7 +55,7 @@ function Chat({
       .channel("custom-update-channel")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "chat" },
+        { event: "*", schema: "public", table: "chats" },
         () => {
           getAllChats();
         }
