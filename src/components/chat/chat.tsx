@@ -38,7 +38,7 @@ function Chat({
   const getAllChats = async () => {
     //filter with project id
     const { data } = await supabaseClient
-      .from("chat")
+      .from("chats")
       .select("*")
       .eq("project_id", projectId);
 
@@ -55,7 +55,7 @@ function Chat({
       .channel("custom-update-channel")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "chat" },
+        { event: "*", schema: "public", table: "chats" },
         () => {
           getAllChats();
         }
@@ -79,7 +79,7 @@ function Chat({
       };
 
       supabaseClient
-        .from("chat")
+        .from("chats")
         .insert(payload)
         .then(() => {
           setText("");
