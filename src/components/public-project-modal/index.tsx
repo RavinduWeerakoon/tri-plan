@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { useList } from "@refinedev/core";
 import { COLORS } from "../../utility/colors";
-import { IconPlane } from "@tabler/icons";
+import { IconPlane } from "@tabler/icons-react";
 
 function PublicProjectModal({
   projectId,

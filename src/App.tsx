@@ -55,7 +55,7 @@ function App() {
   });
 
   const i18nProvider = {
-    translate: (key: string, params: object) => t(key, params),
+    translate: (key: string, params: object) => t(key, String(params)),
     changeLocale: (lang: string) => i18n.changeLanguage(lang),
     getLocale: () => i18n.language,
   };
@@ -122,7 +122,7 @@ function App() {
                 <Route
                   path="/home"
                   element={
-                    <Authenticated fallback={<CatchAllNavigate to="/login" />}>
+                    <Authenticated key="authenticated" fallback={<CatchAllNavigate to="/login" />}>
                       <Home />
                     </Authenticated>
                   }
@@ -132,6 +132,7 @@ function App() {
                     index
                     element={
                       <Authenticated
+                      key = "authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <Projects />
@@ -142,6 +143,7 @@ function App() {
                     path="create"
                     element={
                       <Authenticated
+                      key="authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ProjectCreate />
@@ -152,6 +154,7 @@ function App() {
                     path="edit/:id"
                     element={
                       <Authenticated
+                        key="authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ProjectEdit />
@@ -162,6 +165,7 @@ function App() {
                     path="invite/:userId/:projectId"
                     element={
                       <Authenticated
+                        key="authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <Invite />
@@ -174,6 +178,7 @@ function App() {
                     index
                     element={
                       <Authenticated
+                        key="authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ItineraryList />
@@ -184,6 +189,7 @@ function App() {
                     path="create"
                     element={
                       <Authenticated
+                        key="authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ItineraryCreate />
@@ -194,6 +200,7 @@ function App() {
                     path="edit/:id"
                     element={
                       <Authenticated
+                        key="authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ItineraryEdit />
@@ -204,6 +211,7 @@ function App() {
                     path="show/:id"
                     element={
                       <Authenticated
+                        key="authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ItineraryShow />
