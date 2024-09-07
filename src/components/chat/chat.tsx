@@ -89,12 +89,17 @@ function Chat({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent mx="4">
-        <ModalHeader>Chat</ModalHeader>
+    <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+      <ModalOverlay
+        bg="none"
+        backdropFilter="auto"
+        backdropInvert="80%"
+        backdropBlur="2px"
+      />
+      <ModalContent mx="2">
+        <ModalHeader> Group Chat </ModalHeader>
         <ModalCloseButton />
-        <ModalBody maxH={"60vh"} overflowY={"auto"}>
+        <ModalBody maxH={"70vh"} overflowY={"auto"} overflow={"auto"}>
           {!chats?.length
             ? "Begin chatting"
             : chats?.map((row: any) => {
@@ -120,7 +125,8 @@ function Chat({
                           ? COLORS.primaryColor
                           : COLORS.neutral600
                       }
-                      width={"70%"}
+                      width={"fit-content"}
+                      maxWidth={"70%"}
                       direction={"column"}
                       padding={2}
                     >
