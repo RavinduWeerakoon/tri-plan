@@ -134,7 +134,9 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
   //   return document.URL + "/invite/" + user?.id + "/" + params?.projectId;
   // };
   const getInviteUrl = () => {
-    return `${window.location.origin}/projects/invite/${user?.id}/${params?.projectId}`;
+
+    return  `${window.location.origin}/projects/invite/${user?.id}/${params?.projectId}`;
+
   };
 
   return (

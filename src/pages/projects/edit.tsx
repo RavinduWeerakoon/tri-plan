@@ -15,6 +15,7 @@ import {
 import { useForm } from "@refinedev/react-hook-form";
 import { PROJECT_STATUS } from "../../utility/constants";
 import dayjs from "dayjs";
+import ImageUpload from "../../components/image-upload/ImageUpload"
 
 export const ProjectEdit: React.FC<IResourceComponentsProps> = () => {
   const {
@@ -39,6 +40,8 @@ export const ProjectEdit: React.FC<IResourceComponentsProps> = () => {
       setEndDate(dayjs(projectsData?.end_date).format("YYYY-MM-DD"));
   }, [projectsData]);
 
+
+
   return (
     <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
       <Box py={4} px={8}>
@@ -55,11 +58,8 @@ export const ProjectEdit: React.FC<IResourceComponentsProps> = () => {
           </FormErrorMessage>
         </FormControl>
         <FormControl mb="3" isInvalid={!!(errors as any)?.image_link}>
-          <FormLabel>Project Image link</FormLabel>
-          <Input type="text" {...register("image_link", {})} />
-          <FormErrorMessage>
-            {(errors as any)?.image_link?.message as string}
-          </FormErrorMessage>
+          <FormLabel>Project Image</FormLabel>
+          <ImageUpload/>
         </FormControl>
         <FormControl mb="3" isInvalid={!!(errors as any)?.destination}>
           <FormLabel>Destination</FormLabel>
