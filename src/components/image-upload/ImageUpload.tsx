@@ -13,11 +13,11 @@ import {
 
 const ImageUpload = () => {  // Accept projectId and a callback as props
   const { params } = useParsed();
-  const [imageSrc, setImageSrc] = useState(null);
+  const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
   const [uploadBtn, setUploadBtn] = useState(true)
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
       const reader = new FileReader();
@@ -37,9 +37,10 @@ const ImageUpload = () => {  // Accept projectId and a callback as props
     maxFiles: 1,
   });
 
-  function base64ToFile(base64, filename) {
+  function base64ToFile(base64: string, filename: string) {
     const arr = base64.split(",");
-    const mime = arr[0].match(/:(.*?);/)[1];
+    const matchResult = arr[0].match(/:(.*?);/);
+    const mime = matchResult ? matchResult[1] : '';
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
@@ -49,8 +50,8 @@ const ImageUpload = () => {  // Accept projectId and a callback as props
     return new File([u8arr], filename, { type: mime });
   }
 
-  async function uploadImageToSupabase(imageSrc, filename) {
-    const file = base64ToFile(imageSrc, filename);
+  async function uploadImageToSupabase(imageSrc: string | ArrayBuffer, filename: string) {
+    const file = base64ToFile(imageSrc as string, filename);
     const sanitizedFilename = filename.replace(/\s+/g, "_");
     const { data, error } = await supabaseClient.storage
       .from("project-img")
@@ -116,7 +117,7 @@ const ImageUpload = () => {  // Accept projectId and a callback as props
       {imageSrc && (
         <Box mt={4}>
           <Text>Preview:</Text>
-          <Image src={imageSrc} alt="Uploaded image" maxH="300px" />
+          <Image src={imageSrc as string} alt="Uploaded image" maxH="300px" />
 
         </Box>
       )}
