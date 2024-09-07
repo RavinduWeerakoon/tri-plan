@@ -7,35 +7,48 @@ const Chatbot: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
 
   // Dummy response generator
-  const generateResponse = (question: string) => {
-    const res = {
-      "response": "Okay! So you're looking for a beach in Sri Lanka. Let's explore these options: \n\n* **Kalkudah Beach (Score: 60):** Kalkudah is known for its long stretch of golden sand and calm turquoise waters, perfect for swimming, sunbathing, and simply relaxing. It's also a great place for watersports like windsurfing and kitesurfing. The beach is located in the eastern province, which is less developed than the south coast, making it a more tranquil and secluded option. \n\n* **Beruwala Beach (Score: 45):** Beruwala is a popular beach destination located on the south coast of Sri Lanka. It offers a good mix of things to do, from swimming and sunbathing to watersports and shopping. The beach is also known for its beautiful sunsets. It's a bit more lively than Kalkudah, with a good selection of restaurants and cafes. \n\n* **Mirissa Beach (Score: 8):** Mirissa is a charming little beach town located on the south coast of Sri Lanka. It's known for its stunning beaches, clear waters, and excellent whale watching opportunities. The beach is also home to a number of restaurants, bars, and shops. Mirissa is a great option for those seeking a more laid-back and authentic experience.\n\n* **Induruwa Beach (Score: 53):** Induruwa is a beautiful beach located on the south coast of Sri Lanka. It's known for its pristine white sand and clear blue waters, which are perfect for swimming, sunbathing, and snorkeling. The beach is also relatively secluded, making it a great escape from the hustle and bustle of other tourist destinations. \n\nDo you have any preferences in mind like watersports, nightlife, or seclusion?  This would help me narrow down the options further! \n",
-      "suggested_places": [
-          {
-              "Title": "60. Kalkudah Beach",
-              "image_path": "http://127.0.0.1:8000/static/images/default.jpg"
-          },
-          {
-              "Title": "45. Beruwala",
-              "image_path": "http://127.0.0.1:8000/static/images/45. Beruwala/0.jpg"
-          },
-          {
-              "Title": "8. Mirissa",
-              "image_path": "http://127.0.0.1:8000/static/images/8. Mirissa/0.jpg"
-          },
-          {
-              "Title": "53. Induruwa",
-              "image_path": "http://127.0.0.1:8000/static/images/default.jpg"
-          }
-      ]
-  };
-    return res;
+  const generateResponse = async (question: string) => {
+  //   const res = {
+  //     "response": "Okay! So you're looking for a beach in Sri Lanka. Let's explore these options: \n\n* **Kalkudah Beach (Score: 60):** Kalkudah is known for its long stretch of golden sand and calm turquoise waters, perfect for swimming, sunbathing, and simply relaxing. It's also a great place for watersports like windsurfing and kitesurfing. The beach is located in the eastern province, which is less developed than the south coast, making it a more tranquil and secluded option. \n\n* **Beruwala Beach (Score: 45):** Beruwala is a popular beach destination located on the south coast of Sri Lanka. It offers a good mix of things to do, from swimming and sunbathing to watersports and shopping. The beach is also known for its beautiful sunsets. It's a bit more lively than Kalkudah, with a good selection of restaurants and cafes. \n\n* **Mirissa Beach (Score: 8):** Mirissa is a charming little beach town located on the south coast of Sri Lanka. It's known for its stunning beaches, clear waters, and excellent whale watching opportunities. The beach is also home to a number of restaurants, bars, and shops. Mirissa is a great option for those seeking a more laid-back and authentic experience.\n\n* **Induruwa Beach (Score: 53):** Induruwa is a beautiful beach located on the south coast of Sri Lanka. It's known for its pristine white sand and clear blue waters, which are perfect for swimming, sunbathing, and snorkeling. The beach is also relatively secluded, making it a great escape from the hustle and bustle of other tourist destinations. \n\nDo you have any preferences in mind like watersports, nightlife, or seclusion?  This would help me narrow down the options further! \n",
+  //     "suggested_places": [
+  //         {
+  //             "Title": "60. Kalkudah Beach",
+  //             "image_path": "http://127.0.0.1:8000/static/images/default.jpg"
+  //         },
+  //         {
+  //             "Title": "45. Beruwala",
+  //             "image_path": "http://127.0.0.1:8000/static/images/45. Beruwala/0.jpg"
+  //         },
+  //         {
+  //             "Title": "8. Mirissa",
+  //             "image_path": "http://127.0.0.1:8000/static/images/8. Mirissa/0.jpg"
+  //         },
+  //         {
+  //             "Title": "53. Induruwa",
+  //             "image_path": "http://127.0.0.1:8000/static/images/default.jpg"
+  //         }
+  //     ]
+  // };
+  //   return res;
+
+    const url = `http://139.59.15.179:3030/chat/`
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: question})
+    });
+
+    return response.json(); 
+
   };
 
   // Handle user input submission
-  const handleSend = () => {
+  const handleSend = async () => {
     if (inputValue.trim() === '') return;
-    const response = generateResponse(inputValue);
+    const response = await generateResponse(inputValue);
     setMessages([...messages, { question: inputValue, response }]);
     setInputValue('');
   };
