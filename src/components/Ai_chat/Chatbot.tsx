@@ -63,7 +63,6 @@ const Chatbot: React.FC = () => {
       <Flex
         direction="column"
         justifyContent="space-between"
-        h="100vh"
         p="50px 20px 10px 100px"
       >
         <HStack spacing={4} ml={4}>
