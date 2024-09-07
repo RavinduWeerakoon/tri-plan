@@ -104,7 +104,7 @@ const Chatbot: React.FC = () => {
                     <Text mt={2} fontWeight="bold" color="green.500">
                       Bot:
                     </Text>
-                    <Text>{msg.response["response"]}</Text>
+                    <div dangerouslySetInnerHTML={{ __html: msg.response["response"] }}></div>
 
                     <SimpleGrid columns={[1, 2, 3]} spacing={4} mt={4}>
                       {msg.response["suggested_places"].map((place, index) => (

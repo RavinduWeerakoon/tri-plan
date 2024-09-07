@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Text, VStack, Image, SimpleGrid } from "@chakra-ui/react";
+import { Box,Heading, Text, VStack, Image, SimpleGrid } from "@chakra-ui/react";
 
 const services = [
   {
