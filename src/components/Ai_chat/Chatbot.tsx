@@ -1,113 +1,83 @@
-import React, { useState } from "react";
-import { COLORS } from "../../utility/colors";
-import {
-  Box,
-  Button,
-  Input,
-  VStack,
-  HStack,
-  Text,
-  Container,
-  Center,
-} from "@chakra-ui/react";
-
-interface Message {
-  text: string;
-  sender: "user" | "bot";
-}
+// Chatbot.tsx
+import React, { useState } from 'react';
+import { Box, Input, Button, VStack, HStack, Text, Flex, SimpleGrid, Card, CardBody } from '@chakra-ui/react';
 
 const Chatbot: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [userInput, setUserInput] = useState("");
+  const [messages, setMessages] = useState<{ question: string; response: { response: string; suggested_places: { Title: string; image_path: string }[] } }[]>([]);
+  const [inputValue, setInputValue] = useState('');
 
-  const sendMessage = async () => {
-    if (userInput.trim() === "") return;
+  // Dummy response generator
+  const generateResponse = (question: string) => {
+    const res = {
+      "response": "Okay! So you're looking for a beach in Sri Lanka. Let's explore these options: \n\n* **Kalkudah Beach (Score: 60):** Kalkudah is known for its long stretch of golden sand and calm turquoise waters, perfect for swimming, sunbathing, and simply relaxing. It's also a great place for watersports like windsurfing and kitesurfing. The beach is located in the eastern province, which is less developed than the south coast, making it a more tranquil and secluded option. \n\n* **Beruwala Beach (Score: 45):** Beruwala is a popular beach destination located on the south coast of Sri Lanka. It offers a good mix of things to do, from swimming and sunbathing to watersports and shopping. The beach is also known for its beautiful sunsets. It's a bit more lively than Kalkudah, with a good selection of restaurants and cafes. \n\n* **Mirissa Beach (Score: 8):** Mirissa is a charming little beach town located on the south coast of Sri Lanka. It's known for its stunning beaches, clear waters, and excellent whale watching opportunities. The beach is also home to a number of restaurants, bars, and shops. Mirissa is a great option for those seeking a more laid-back and authentic experience.\n\n* **Induruwa Beach (Score: 53):** Induruwa is a beautiful beach located on the south coast of Sri Lanka. It's known for its pristine white sand and clear blue waters, which are perfect for swimming, sunbathing, and snorkeling. The beach is also relatively secluded, making it a great escape from the hustle and bustle of other tourist destinations. \n\nDo you have any preferences in mind like watersports, nightlife, or seclusion?  This would help me narrow down the options further! \n",
+      "suggested_places": [
+          {
+              "Title": "60. Kalkudah Beach",
+              "image_path": "http://127.0.0.1:8000/static/images/default.jpg"
+          },
+          {
+              "Title": "45. Beruwala",
+              "image_path": "http://127.0.0.1:8000/static/images/45. Beruwala/0.jpg"
+          },
+          {
+              "Title": "8. Mirissa",
+              "image_path": "http://127.0.0.1:8000/static/images/8. Mirissa/0.jpg"
+          },
+          {
+              "Title": "53. Induruwa",
+              "image_path": "http://127.0.0.1:8000/static/images/default.jpg"
+          }
+      ]
+  };
+    return res;
+  };
 
-    const userMessage: Message = { text: userInput, sender: "user" };
-    setMessages((prev) => [...prev, userMessage]);
-    setUserInput("");
-
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: userInput }),
-    });
-    const data = await response.json();
-    const botMessage: Message = { text: data.message, sender: "bot" };
-    setMessages((prev) => [...prev, userMessage, botMessage]);
+  // Handle user input submission
+  const handleSend = () => {
+    if (inputValue.trim() === '') return;
+    const response = generateResponse(inputValue);
+    setMessages([...messages, { question: inputValue, response }]);
+    setInputValue('');
   };
 
   return (
-    <Container
-      maxW="md"
-      borderWidth="1px"
-      borderRadius="lg"
-      borderColor={COLORS.primaryColor}
-      p={4}
-    >
-      <VStack spacing={4}>
-        <Box
-          w="100%"
-          h="300px"
-          overflowY="auto"
-          borderWidth="1px"
-          border="2px"
-          borderColor={COLORS.primaryColor}
-          borderRadius="md"
-          p={2}
-          display={messages.length === 0 ? "flex" : "block"}
-          alignItems={messages.length === 0 ? "center" : "initial"}
-          justifyContent={messages.length === 0 ? "center" : "initial"}
-        >
-          <VStack spacing="3px">
-            {messages.length === 0 ? (
-              <Text textAlign="center" color="gray.500">
-                Explore locations easily with our AI bot. Just ask for cafes,
-                cultural spots, or peaceful getaways, and get instant
-                recommendations. It's that simple!
-              </Text>
-            ) : (
-              messages.map((msg, index) => (
-                <HStack
-                  key={index}
-                  justify={msg.sender === "user" ? "flex-end" : "flex-start"}
-                  w="100%"
-                >
-                  <Text
-                    bg={msg.sender === "user" ? "yellow.200" : "gray.100"}
-                    borderColor={COLORS.primaryColor}
-                    borderRadius="md"
-                    p={2}
-                    maxW="75%"
-                  >
-                    {msg.text}
-                  </Text>
-                </HStack>
-              ))
-            )}
-          </VStack>
-        </Box>
-        <HStack w="100%">
-          <Input
-            border="2px"
-            borderColor={COLORS.primaryColor}
-            borderRadius="md"
-            placeholder="Message..."
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-          />
-          <Button
-            border="1px"
-            borderColor={COLORS.primaryColor}
-            backgroundColor={COLORS.primaryColor}
-            borderRadius="md"
-            onClick={sendMessage}
-          >
-            Send
-          </Button>
-        </HStack>
+    <Flex direction="column" justifyContent="space-between" h="100vh" p={4}>
+      {/* Chat Messages */}
+      <VStack spacing={4} align="stretch" mb={4} flexGrow={1}>
+        {messages.map((msg, index) => (
+          <Box key={index} borderRadius="md" p={4} bg="gray.100">
+            <Text fontWeight="bold" color="blue.500">You:</Text>
+            <Text>{msg.question}</Text>
+            <Text mt={2} fontWeight="bold" color="green.500">Bot:</Text>
+            <Text>{msg.response["response"]}</Text>
+
+            <SimpleGrid columns={[1, 2, 3]} spacing={4} mt={4}>
+            {msg.response["suggested_places"].map((place, index) => (
+              <Card key={index}>
+                <CardBody>
+                  <img src={place.image_path} alt={place.Title} />
+                  <Text mt={2}>{place.Title}</Text>
+                </CardBody>
+              </Card>
+            ))}
+          </SimpleGrid>
+          </Box>
+        ))}
       </VStack>
-    </Container>
+
+      {/* Input and Send Button */}
+      <HStack spacing={4}>
+        <Input
+          placeholder="Ask a question..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+        />
+        <Button colorScheme="blue" onClick={handleSend}>
+          Send
+        </Button>
+      </HStack>
+    </Flex>
   );
 };
 
