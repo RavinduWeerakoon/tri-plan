@@ -1,25 +1,41 @@
-import { Box,Heading, Text, VStack, Image, SimpleGrid } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  VStack,
+  Image,
+  SimpleGrid,
+} from "@chakra-ui/react";
 
+import GuidedTourImage from "../../assets/guided-tour.jpg";
+import FlightsImage from "../../assets/best-flight.jpg";
+import ReligiousToursImage from "../../assets/religious-tour.jpg";
+import MedicalInsuranceImage from "../../assets/medical-insurance.jpg";
 const services = [
   {
     title: "Guided Tours",
-    description: "sunt qui repellat saepe quo velit aperiam id aliquam placeat.",
-    image: "path/to/guided_tours_icon.png", // Replace with the correct image path
+    description:
+      "sunt qui repellat saepe quo velit aperiam id aliquam placeat.",
+    image: GuidedTourImage, // Replace with the correct image path
   },
   {
     title: "Best Flights Options",
-    description: "sunt qui repellat saepe quo velit aperiam id aliquam placeat.",
-    image: "path/to/flights_icon.png",
+    description:
+      "sunt qui repellat saepe quo velit aperiam id aliquam placeat.",
+    image: FlightsImage,
   },
   {
     title: "Religious Tours",
-    description: "sunt qui repellat saepe quo velit aperiam id aliquam placeat.",
-    image: "path/to/religious_tours_icon.png",
+    description:
+      "sunt qui repellat saepe quo velit aperiam id aliquam placeat.",
+    image: ReligiousToursImage,
   },
   {
     title: "Medical Insurance",
-    description: "sunt qui repellat saepe quo velit aperiam id aliquam placeat.",
-    image: "path/to/medical_insurance_icon.png",
+    description:
+      "sunt qui repellat saepe quo velit aperiam id aliquam placeat.",
+    image: MedicalInsuranceImage,
   },
 ];
 
@@ -28,7 +44,9 @@ export default function ServicesSection() {
     <Box py={10} px={6} bg="white">
       {/* Section Title */}
       <VStack spacing={2} mb={8} textAlign="center">
-        <Text fontSize="sm" color="orange.500" fontWeight="bold">CATEGORY</Text>
+        <Text fontSize="sm" color="orange.500" fontWeight="bold">
+          CATEGORY
+        </Text>
         <Heading as="h2" fontSize="3xl" color="gray.700">
           We Offer Best Services
         </Heading>
