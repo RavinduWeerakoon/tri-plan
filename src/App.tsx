@@ -107,7 +107,7 @@ function App() {
                     Title={({ collapsed }) => (
                       <ThemedTitleV2
                         collapsed={collapsed}
-                        text="TripStash"
+                        text="TriPlan"
                         icon={<Logo />}
                       />
                     )}
