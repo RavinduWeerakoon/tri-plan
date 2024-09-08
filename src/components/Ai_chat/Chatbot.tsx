@@ -63,7 +63,6 @@ const Chatbot: React.FC = () => {
       <Flex
         direction="column"
         justifyContent="space-between"
-        h="100vh"
         p="50px 20px 10px 100px"
       >
         <HStack spacing={4} ml={4}>
@@ -104,7 +103,7 @@ const Chatbot: React.FC = () => {
                     <Text mt={2} fontWeight="bold" color="green.500">
                       Bot:
                     </Text>
-                    <Text>{msg.response["response"]}</Text>
+                    <div dangerouslySetInnerHTML={{ __html: msg.response["response"] }}></div>
 
                     <SimpleGrid columns={[1, 2, 3]} spacing={4} mt={4}>
                       {msg.response["suggested_places"].map((place, index) => (
