@@ -1,3 +1,4 @@
+import React, { useCallback, useRef, useState } from 'react';
 import {
   HttpError,
   IResourceComponentsProps,
@@ -21,12 +22,25 @@ import { useForm } from "@refinedev/react-hook-form";
 import { ACTIVITIES, ITINERARY_STATUS } from "../../utility/constants";
 import { useNavigate } from "react-router-dom";
 import { IProject } from "../../utility/interface";
-import { useState } from "react";
 import dayjs from "dayjs";
 import { IUser } from "../../utility/interface";
-import { COLORS } from "../../utility/colors";
+import { GoogleMap, useJsApiLoader, MarkerF, Autocomplete } from '@react-google-maps/api';
 
 export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
+  const defaultCenter = {
+    lat: 6.927079,
+    lng: 79.861244  
+  };
+  const [location, setLocation] = useState('');
+  const [markerPosition, setMarkerPosition] = useState(defaultCenter);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+
+  // Define the handleInputChange function
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLocation(event.target.value);
+  };
+
   const {
     refineCore: { formLoading, onFinish },
     saveButtonProps,
@@ -42,12 +56,8 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
     resource: "projects",
     ids,
   });
-  const itineraryMinStartDate = dayjs(data?.data?.[0]?.start_date).format(
-    "YYYY-MM-DD"
-  );
-  const itineraryMaxStartDate = dayjs(data?.data?.[0]?.end_date).format(
-    "YYYY-MM-DD"
-  );
+  const itineraryMinStartDate = dayjs(data?.data?.[0]?.start_date).format("YYYY-MM-DD");
+  const itineraryMaxStartDate = dayjs(data?.data?.[0]?.end_date).format("YYYY-MM-DD");
 
   const handleSubmitItineraryCreate = (values: any) => {
     onFinish({
@@ -61,6 +71,41 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
       },
     }).then(() => navigate(`/${params?.projectId}/itinerary`));
   };
+    
+  const apiKey: string = import.meta.env.VITE_REACT_APP_API_KEY as string;
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: apiKey,
+    libraries: ["places"],
+  });
+
+  const containerStyle = {
+    width: '400px',
+    height: '400px'
+  };
+
+  const onLoadAutocomplete = useCallback((autocomplete: google.maps.places.Autocomplete) => {
+    autocompleteRef.current = autocomplete;
+    if (inputRef.current) {
+      autocomplete.setOptions({
+        types: ['geocode']
+      });
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.formatted_address) {
+          setLocation(place.formatted_address);
+          if (place.geometry && place.geometry.location) {
+            setMarkerPosition({
+              lat: place.geometry.location.lat(),
+              lng: place.geometry.location.lng(),
+            });
+          }
+        }
+      });
+    }
+  }, []);
+
+  if (loadError) return <div>Error loading Google Maps script</div>;
+  if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <Create
@@ -102,25 +147,62 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
                 required: "This field is required",
               })}
             />
+            <FormErrorMessage>
+              {(errors as any)?.date?.message as string}
+            </FormErrorMessage>
           </FormControl>
-          <FormErrorMessage>
-            {(errors as any)?.date?.message as string}
-          </FormErrorMessage>
         </Flex>
 
-        <FormControl mb="3" isInvalid={!!(errors as any)?.location}>
-          <FormLabel>Location</FormLabel>
-          <Input
-            id="location"
-            type="text"
-            {...register("location", {
-              required: "This field is required",
-            })}
-          />
-          <FormErrorMessage>
-            {(errors as any)?.location?.message as string}
-          </FormErrorMessage>
-        </FormControl>
+        <Flex gap={4}>
+          <FormControl mb="3" isInvalid={!!(errors as any)?.location}>
+            <FormLabel>Location</FormLabel>
+            <Autocomplete
+              onLoad={onLoadAutocomplete}
+              onPlaceChanged={() => {
+                if (autocompleteRef.current) {
+                  const place = autocompleteRef.current.getPlace();
+                  if (place.formatted_address) {
+                    setLocation(place.formatted_address);
+                    if (place.geometry && place.geometry.location) {
+                      setMarkerPosition({
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng(),
+                      });
+                    }
+                  }
+                }
+              }}
+            >
+              <Input
+                id="location"
+                type="text"
+                placeholder="Enter a location"
+                {...register("location", {
+                  required: "This field is required",
+                })}
+                value={location}
+                onChange={handleInputChange}
+              />
+            </Autocomplete>
+            <FormErrorMessage>
+              {(errors as any)?.location?.message as string}
+            </FormErrorMessage>
+          </FormControl>
+
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={markerPosition}
+            zoom={9}
+            options={{
+              zoomControl: false,
+              streetViewControl: false,
+              mapTypeControl: false,
+              fullscreenControl: false,
+            }}
+          >
+            <MarkerF position={markerPosition} />
+          </GoogleMap>
+        </Flex>
 
         <FormControl mb="3" isInvalid={!!(errors as any)?.media_url}>
           <FormLabel>Media URL</FormLabel>
@@ -129,6 +211,7 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
             {(errors as any)?.media_url?.message as string}
           </FormErrorMessage>
         </FormControl>
+
         <FormControl mb="3" isInvalid={!!(errors as any)?.type_of_activity}>
           <FormLabel>Type of Activity</FormLabel>
           <Select
