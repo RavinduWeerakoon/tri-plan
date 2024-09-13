@@ -17,6 +17,7 @@ import {
   Flex,
   Textarea,
   Box,
+  border,
 } from "@chakra-ui/react";
 import { useForm } from "@refinedev/react-hook-form";
 import { ACTIVITIES, ITINERARY_STATUS } from "../../utility/constants";
@@ -80,7 +81,9 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
 
   const containerStyle = {
     width: '400px',
-    height: '400px'
+    height: '400px',
+    borderRadius: '15px',
+    overflow: 'hidden',
   };
 
   const onLoadAutocomplete = useCallback((autocomplete: google.maps.places.Autocomplete) => {
@@ -188,7 +191,6 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
               {(errors as any)?.location?.message as string}
             </FormErrorMessage>
           </FormControl>
-
           <GoogleMap
             mapContainerStyle={containerStyle}
             center={markerPosition}
@@ -199,9 +201,10 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
               mapTypeControl: false,
               fullscreenControl: false,
             }}
-          >
+            >
             <MarkerF position={markerPosition} />
           </GoogleMap>
+
         </Flex>
 
         <FormControl mb="3" isInvalid={!!(errors as any)?.media_url}>
