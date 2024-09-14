@@ -106,7 +106,13 @@ export const Projects: React.FC = () => {
     <Box bg={COLORS.white} padding={4}>
       {userHasProjects ? (
         <div>
-          <Flex justifyContent="space-between" alignItems="center" mb={8}>
+          <Flex
+            flexDirection={{ base: "column", md: "row" }}
+            justifyContent="space-between"
+            gap={4}
+            alignItems={{ base: "left", md: "center" }}
+            mb={8}
+          >
             <div>
               <Text fontSize="2xl" as="b">
                 Your stash

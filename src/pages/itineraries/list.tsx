@@ -9,7 +9,7 @@ import {
   useMany,
   useList,
 } from "@refinedev/core";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   List,
   DateField,
@@ -38,6 +38,7 @@ import {
   Button,
   TagLabel,
   Box,
+  Icon,
 } from "@chakra-ui/react";
 import { COLORS } from "../../utility/colors";
 import { IItinerary, IProject, IUser } from "../../utility/interface";
@@ -51,8 +52,10 @@ import InviteModal from "../../components/invite-modal";
 import { ITINERARY_STATUS } from "../../utility/constants";
 import Chat from "../../components/chat/chat";
 import dayjs from "dayjs";
-import { getActivityColor } from "../../utility";
+import { getActivityColor, supabaseClient } from "../../utility";
 import ImageUpload from "../../components/image-upload";
+import AddBillManually from "./AddExpenseModal";
+
 export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
@@ -62,7 +65,7 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
   const [dropbox, setdropbox] = useState(false);
 
   const { mutate } = useUpdate<HttpError>();
-  const { params } = useParsed();
+  const params = useParams();
   const navigate = useNavigate();
   const { data: user } = useGetIdentity<IUser>();
   const { tableQueryResult, setFilters, filters } = useTable<
@@ -100,6 +103,16 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
       setbills(_bills);
     }
   }, [billData, params?.projectId]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   const { data: projectData } = useMany<IProject, HttpError>({
     resource: "projects",
@@ -154,84 +167,13 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
       });
     }
   };
-  // const getInviteUrl = () => {
-  //   return document.URL + "/invite/" + user?.id + "/" + params?.projectId;
-  // };
+
   const getInviteUrl = () => {
     return `${window.location.origin}/projects/invite/${user?.id}/${params?.projectId}`;
   };
 
   const showdropbox = () => {
     setdropbox(!dropbox);
-  };
-
-  const handleImageUpload = async (
-    imageSrc,
-    imageFile,
-    uploadImageToSupabase,
-    supabaseClient,
-    setUploadBtn
-  ) => {
-    if (imageSrc && imageFile) {
-      console.log("Uploading image to Supabase...", imageFile.name);
-      const filename = `${Date.now()}-${imageFile.name}`;
-      const imageUrl = await uploadImageToSupabase(imageSrc, filename);
-
-      if (imageUrl) {
-        console.log("Image uploaded to Supabase:", imageUrl);
-
-        const formData = new FormData();
-        formData.append("file", imageFile);
-        try {
-          const response = await fetch(
-            "http://139.59.15.179:8000/extract-info/",
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-          const data = await response.json();
-
-          if (response.ok) {
-            console.log("Image successfully processed by API:", data);
-
-            const { date, amount, time, items } = data;
-
-            const added_user = {
-              id: user?.id,
-              email: user?.email,
-            };
-            const { error } = await supabaseClient.from("bills").insert([
-              {
-                date: date || new Date().toISOString().split("T")[0],
-                price: amount || 0,
-                description: "No description",
-                time: time,
-                items: items || [],
-                project_id: params?.projectId,
-                added_user: added_user,
-                Bill_link: imageUrl,
-              },
-            ]);
-            if (error) {
-              console.error(
-                "Error inserting bill data into Supabase:",
-                error.message
-              );
-            } else {
-              console.log("Bill data successfully inserted into Supabase!");
-              setUploadBtn(false);
-            }
-          } else {
-            console.error("Error :", data);
-          }
-        } catch (error) {
-          console.error("Error while sending:", error);
-        }
-
-        setUploadBtn(false);
-      }
-    }
   };
 
   return (
@@ -271,18 +213,32 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
           {activeTab === "Bills" && (
             <Button
               bg={COLORS.primaryColor}
-              leftIcon={<IconPlus />}
-              onClick={showdropbox}
+              leftIcon={<Icon as={IconPlus} />}
+              onClick={handleOpenModal}
               color={COLORS.white}
             >
-              Add Bill
+              Add Expense
             </Button>
           )}
+          <AddBillManually
+            projectId={params?.projectId}
+            added_User={{ id: params?.id, email: params?.email }}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+          />
         </>
       )}
     >
-      <Tabs variant="soft-rounded" mt={8} colorScheme="pink" minHeight={"80vh"}>
-        <TabList>
+      <Tabs
+        variant="soft-rounded"
+        mt={8}
+        colorScheme="pink"
+        minHeight={"80vh"}
+        isFitted // Ensure the tabs fit within the parent
+      >
+        <TabList
+          flexWrap={{ base: "wrap", md: "nowrap" }} // Wrap the tabs on smaller screens
+        >
           <Tab
             color={COLORS.primaryColor}
             onClick={() => {
@@ -290,6 +246,9 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
               setFilters([]);
               navigate(`/${params?.projectId}/itinerary`);
             }}
+            fontSize={{ base: "sm", md: "md" }} // Responsive font size
+            p={{ base: 2, md: 4 }} // Responsive padding
+            whiteSpace="normal" // Allow text to wrap
           >
             All Items
           </Tab>
@@ -305,6 +264,9 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
                 },
               ]);
             }}
+            fontSize={{ base: "sm", md: "md" }} // Responsive font size
+            p={{ base: 2, md: 4 }} // Responsive padding
+            whiteSpace="normal" // Allow text to wrap
           >
             Confirmed
           </Tab>
@@ -320,22 +282,22 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
                 },
               ]);
             }}
+            fontSize={{ base: "sm", md: "md" }} // Responsive font size
+            p={{ base: 2, md: 4 }} // Responsive padding
+            whiteSpace="normal" // Allow text to wrap
           >
             Canceled
           </Tab>
           <Tab
             color={COLORS.primaryColor}
             onClick={() => setActiveTab("Bills")}
+            fontSize={{ base: "sm", md: "md" }} // Responsive font size
+            p={{ base: 2, md: 4 }}
+            whiteSpace="normal"
           >
-            Bills
+            Expenses
           </Tab>
         </TabList>
-        {activeTab === "Bills" && dropbox && (
-          <ImageUpload
-            bucket_name="bill-image"
-            handleUpload={handleImageUpload}
-          />
-        )}
 
         <TabPanels overflowX={"auto"}>
           <ItineraryTabPanel
@@ -399,6 +361,43 @@ const BillTabPanel = ({ list, userId }: { list: any; userId: any }) => {
     console.log("id", id);
     navigate(`/bills/edit/${id}`);
   };
+
+  let total = 0;
+  list.forEach((bill: any) => {
+    total += bill.price;
+  });
+
+  const [collaboratorCount, setCollaboratorCount] = useState<number>(3);
+
+  const fetchProjectById = async () => {
+    const { data, error } = await supabaseClient
+      .from("projects")
+      .select("collaborators") // Only select the 'collaborators' column
+      .eq("id", params?.projectId);
+
+    if (error) {
+      console.error("Error fetching project:", error);
+      return null;
+    }
+
+    if (data && data.length > 0) {
+      const collaborators = data[0].collaborators; // Assuming the first record is the desired one
+      const collaboratorsCount = collaborators ? collaborators.length : 0; // Check if collaborators exist and get the length
+      console.log("Number of collaborators:", collaboratorsCount);
+      return collaboratorsCount;
+    }
+
+    return 0;
+  };
+  useEffect(() => {
+    const fetchCollaboratorCount = async () => {
+      const count = await fetchProjectById();
+      setCollaboratorCount(count || 1);
+    };
+
+    fetchCollaboratorCount();
+  }, []);
+
   return (
     <TabPanel padding={"unset"} pt={4} width={"100%"}>
       <TableContainer
@@ -437,7 +436,7 @@ const BillTabPanel = ({ list, userId }: { list: any; userId: any }) => {
                   <Box>
                     {Object.entries(bill.items).map(
                       ([item, count]: [string, unknown]) => (
-                        <Text key={item}>{`${item}: ${count}`}</Text>
+                        <Text key={item}>{`${item}`}</Text>
                       )
                     )}
                   </Box>
@@ -465,6 +464,11 @@ const BillTabPanel = ({ list, userId }: { list: any; userId: any }) => {
           </Tbody>
         </Table>
       </TableContainer>
+      {/* Total expense section */}
+      <Text mt={4} fontSize="lg" fontWeight="bold" color="teal.500">
+        Total expense for a person is:{" "}
+        {(total / Number(collaboratorCount)).toFixed(2)}
+      </Text>
     </TabPanel>
   );
 };

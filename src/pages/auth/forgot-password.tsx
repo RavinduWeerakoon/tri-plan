@@ -10,6 +10,10 @@ export function ForgotPassword() {
         title={
           <ThemedTitleV2 text="Trip Stash" icon={<Logo />} collapsed={false} />
         }
+        wrapperProps={{
+          p: { base: "4", md: "8" }, // Smaller padding on mobile
+          maxWidth: { base: "100%", md: "50%" }, // Full width on mobile, reduced width on desktop
+        }}
         type="forgotPassword"
       />
       ;

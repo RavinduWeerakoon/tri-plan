@@ -52,7 +52,7 @@ export const ProjectCreate: React.FC<IResourceComponentsProps> = () => {
         </Heading>
       }
     >
-      <Box py={4} px={8}>
+      <Box py={4} px={8} marginLeft={{ base: "-10", md: "0" }}>
         <FormControl mb="3" mt={"4"} isInvalid={!!(errors as any)?.title}>
           <FormLabel>Name</FormLabel>
           <Input

@@ -7,12 +7,15 @@ export function Register() {
   return (
     <AuthTemplate>
       <AuthPage
+        type="login"
         title={
-          <ThemedTitleV2 text="Trip Stash" icon={<Logo />} collapsed={false} />
+          <ThemedTitleV2 text="TriPlan" icon={<Logo />} collapsed={false} />
         }
-        type="register"
+        wrapperProps={{
+          p: { base: "4", md: "8" }, // Smaller padding on mobile
+          maxWidth: { base: "100%", md: "50%" }, // Full width on mobile, reduced width on desktop
+        }}
       />
-      ;
     </AuthTemplate>
   );
 }

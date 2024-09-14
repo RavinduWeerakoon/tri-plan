@@ -66,6 +66,10 @@ const ImageUpload = ({ bucket_name, handleUpload }) => {
 
     // If an error occurs during the upload, log it and return null
     if (error) {
+      <Alert status="error">
+        <AlertIcon />
+        Error uploading file
+      </Alert>;
       console.error("Error uploading file:", error.message);
       return null;
     }

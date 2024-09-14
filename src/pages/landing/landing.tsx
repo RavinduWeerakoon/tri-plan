@@ -2,7 +2,18 @@ import React from "react";
 import HeroImage from "../../assets/hero.png";
 import RightImage from "../../assets/right.png";
 import LeftImage from "../../assets/left.png";
-import { Image, Text, Flex, Spacer, Heading, Button, HStack, Input, Select, Box } from "@chakra-ui/react";
+import {
+  Image,
+  Text,
+  Flex,
+  Spacer,
+  Heading,
+  Button,
+  HStack,
+  Input,
+  Select,
+  Box,
+} from "@chakra-ui/react";
 import { useNavigation } from "@refinedev/core";
 import { useIsAuthenticated } from "@refinedev/core";
 import { COLORS } from "../../utility/colors";
@@ -23,29 +34,36 @@ export function Landing() {
   };
 
   return (
-    <div style={{ padding: " 8px", width: "80%", margin: "0 auto" }}>
-      <Box >
-      {/* Navbar */}
-      <Flex as="nav" align="center" justify="space-between" p={6}>
-        <Heading as="h1" size="lg" style={{display:'flex'}}><Logo/>TriPlan</Heading>
-        <HStack spacing={8}>
-          <Button variant="link">Home</Button>
-          <Button variant="link">About</Button>
-          <Button
-            margin={"auto"}
-            bg={COLORS.primaryColor}
-            color={COLORS.white}
-            variant="solid"
-            size="md"
-            onClick={handleRouteToLogin}
+    <div style={{ padding: "8px", width: "100%", margin: "0 auto" }}>
+      <Box>
+        {/* Navbar */}
+        <Flex as="nav" align="center" justify="space-between" p={6}>
+          <Heading
+            as="h1"
+            size="lg"
+            display="flex"
+            alignItems="center"
+            marginLeft={{ base: "-5", md: "initial" }}
           >
-            {data?.authenticated ? "Go to home" : "Join us now"}
-          </Button>
-        </HStack>
-      </Flex>
+            <Logo />
+            TriPlan
+          </Heading>
+          <HStack spacing={8}>
+            <Button
+              margin={"auto"}
+              bg={COLORS.primaryColor}
+              color={COLORS.white}
+              variant="solid"
+              size="md"
+              onClick={handleRouteToLogin}
+            >
+              {data?.authenticated ? "Go to home" : "Join us now"}
+            </Button>
+          </HStack>
+        </Flex>
 
-      {/* Hero Section */}
-    </Box>
+        {/* Hero Section */}
+      </Box>
       <Spacer h="48px" />
       <Flex direction="column" alignItems={"center"}>
         <Heading textAlign={"center"} as="h1" size="xl" mb="4">
@@ -65,7 +83,7 @@ export function Landing() {
         />
       </Flex>
 
-      <ServicesSection/>
+      <ServicesSection />
 
       <Flex
         direction={[
