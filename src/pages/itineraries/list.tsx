@@ -50,8 +50,11 @@ import { ITINERARY_STATUS } from "../../utility/constants";
 import Chat from "../../components/chat/chat";
 import dayjs from "dayjs";
 import { getActivityColor } from "../../utility";
+import PhotoGallery from "../../components/photo-gallery/PhotoGallery";
+import { Center } from '@chakra-ui/react'
 
 export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
+  const [activeTab, setActiveTab] = useState<string>('');
   const [inviteOpen, setInviteOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chats, setChats] = useState<any>([]);
@@ -138,7 +141,7 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
     return  `${window.location.origin}/projects/invite/${user?.id}/${params?.projectId}`;
 
   };
-
+  
   return (
     <List
       title={<Heading size="lg">{projectData?.data?.[0]?.title}</Heading>}
@@ -215,6 +218,11 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
           >
             Canceled
           </Tab>
+          <Tab
+            color={COLORS.primaryColor}
+            onClick={() => {setActiveTab('imageGallery');}}>
+            Image Gallery
+          </Tab>
         </TabList>
 
         <TabPanels>
@@ -236,6 +244,18 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
             handleStatusChange={handleStatusChange}
             userId={user?.id}
           />
+          <TabPanel>
+            {activeTab === 'imageGallery' && (
+              <div>
+                {/* Your image gallery component or code here */}
+                <Center h='100px' color='black'>
+                  <Text as='b' fontSize='40px' color='black'>Image Gallery</Text>
+                </Center>
+                <PhotoGallery />
+                
+              </div>
+            )}
+        </TabPanel>
         </TabPanels>
       </Tabs>
       <InviteModal
