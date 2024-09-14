@@ -8,7 +8,7 @@ export function Login() {
       <AuthPage
         type="login"
         title={
-          <ThemedTitleV2 text="Trip Stash" icon={<Logo />} collapsed={false} />
+          <ThemedTitleV2 text="TriPlan" icon={<Logo />} collapsed={false} />
         }
       />
     </AuthTemplate>

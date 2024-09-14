@@ -42,6 +42,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ project_id, type }) => {  // 
     maxFiles: 1,
   });
 
+
   let pathName = '';
   if(type === "edit"){
     pathName = `images/${project_id}`;
@@ -53,6 +54,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ project_id, type }) => {  // 
     const arr = base64.split(",");
     const mimeMatch = arr[0].match(/:(.*?);/);
     const mime = mimeMatch ? mimeMatch[1] : '';
+
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
@@ -64,6 +66,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ project_id, type }) => {  // 
 
   async function uploadImageToSupabase(imageSrc: string, filename: string) {
     const file = base64ToFile(imageSrc, filename);
+
     const sanitizedFilename = filename.replace(/\s+/g, "_");
     const { data, error } = await supabaseClient.storage
       .from("project-img")
@@ -131,6 +134,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ project_id, type }) => {  // 
         <Box mt={4}>
           <Text>Preview:</Text>
           <Image src={typeof imageSrc === 'string' ? imageSrc : undefined} alt="Uploaded image" maxH="300px" />
+
         </Box>
       )}
       <Box mt={4}>

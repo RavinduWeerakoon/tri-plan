@@ -26,6 +26,7 @@ import PublicProjectModal from "../../components/public-project-modal";
 import { useNavigate } from "react-router-dom";
 import Chatbot from "../../components/Ai_chat/Chatbot";
 
+
 export function Home() {
   const { push } = useNavigation();
   const { data: user } = useGetIdentity<IUser>();

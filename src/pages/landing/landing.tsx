@@ -2,10 +2,12 @@ import React from "react";
 import HeroImage from "../../assets/hero.png";
 import RightImage from "../../assets/right.png";
 import LeftImage from "../../assets/left.png";
-import { Image, Text, Flex, Spacer, Heading, Button } from "@chakra-ui/react";
+import { Image, Text, Flex, Spacer, Heading, Button, HStack, Input, Select, Box } from "@chakra-ui/react";
 import { useNavigation } from "@refinedev/core";
 import { useIsAuthenticated } from "@refinedev/core";
 import { COLORS } from "../../utility/colors";
+import { Logo } from "../../assets/logo";
+import ServicesSection from "./serviceSection";
 
 export function Landing() {
   const { push } = useNavigation();
@@ -22,6 +24,28 @@ export function Landing() {
 
   return (
     <div style={{ padding: " 8px", width: "80%", margin: "0 auto" }}>
+      <Box >
+      {/* Navbar */}
+      <Flex as="nav" align="center" justify="space-between" p={6}>
+        <Heading as="h1" size="lg" style={{display:'flex'}}><Logo/>TriPlan</Heading>
+        <HStack spacing={8}>
+          <Button variant="link">Home</Button>
+          <Button variant="link">About</Button>
+          <Button
+            margin={"auto"}
+            bg={COLORS.primaryColor}
+            color={COLORS.white}
+            variant="solid"
+            size="md"
+            onClick={handleRouteToLogin}
+          >
+            {data?.authenticated ? "Go to home" : "Join us now"}
+          </Button>
+        </HStack>
+      </Flex>
+
+      {/* Hero Section */}
+    </Box>
       <Spacer h="48px" />
       <Flex direction="column" alignItems={"center"}>
         <Heading textAlign={"center"} as="h1" size="xl" mb="4">
@@ -31,17 +55,7 @@ export function Landing() {
           Turn your collective travel inspirations into unforgettable journey
           with TriPlan. Plan Together, Experience Together.
         </Text>
-        <Button
-          margin={"auto"}
-          mt="8"
-          bg={COLORS.primaryColor}
-          color={COLORS.white}
-          variant="solid"
-          size="md"
-          onClick={handleRouteToLogin}
-        >
-          {data?.authenticated ? "Go to home" : "Join us now"}
-        </Button>
+
         <Image
           src={HeroImage}
           alt="Hero Image"
@@ -50,6 +64,8 @@ export function Landing() {
           mt="8"
         />
       </Flex>
+
+      <ServicesSection/>
 
       <Flex
         direction={[
