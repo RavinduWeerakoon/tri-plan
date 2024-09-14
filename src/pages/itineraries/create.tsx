@@ -72,8 +72,7 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
       },
     }).then(() => navigate(`/${params?.projectId}/itinerary`));
   };
-    
-  const apiKey: string = import.meta.env.VITE_REACT_APP_API_KEY as string;
+  const apiKey = process.env.VITE_REACT_APP_API_KEY || '';
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: apiKey,
     libraries: ["places"],
