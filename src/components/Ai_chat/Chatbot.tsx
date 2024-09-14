@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import { COLORS } from "../../utility/colors";
-import {
-  Box,
-  Button,
-  Input,
-  VStack,
-  HStack,
-  Text,
-  Container,
-  Center,
-} from "@chakra-ui/react";
+import { Box, Button, Input, VStack, HStack, Text, Container, Center } from "@chakra-ui/react";
 
 interface Message {
   text: string;
@@ -37,71 +27,95 @@ const Chatbot: React.FC = () => {
     setMessages((prev) => [...prev, userMessage, botMessage]);
   };
 
+  // Define color shades
+  const primaryColor = "rgb(223, 81, 115)";
+  const lightPrimaryColor = "rgba(223, 81, 115, 0.2)"; // lighter shade of primary color
+  const darkPrimaryColor = "rgba(223, 81, 115, 0.8)"; // darker shade of primary color
+
   return (
     <Container
-      maxW="md"
+      maxW="lg"
       borderWidth="1px"
       borderRadius="lg"
-      borderColor={COLORS.primaryColor}
+      borderColor="gray.200"
       p={4}
+      boxShadow="lg"
+      bg="white"
+      mt={0}
+      mb={6}
     >
-      <VStack spacing={4}>
+      <VStack spacing={4} align="stretch">
         <Box
           w="100%"
-          h="300px"
+          h="400px"
           overflowY="auto"
           borderWidth="1px"
-          border="2px"
-          borderColor={COLORS.primaryColor}
-          borderRadius="md"
-          p={2}
-          display={messages.length === 0 ? "flex" : "block"}
-          alignItems={messages.length === 0 ? "center" : "initial"}
-          justifyContent={messages.length === 0 ? "center" : "initial"}
+          borderColor="gray.200"
+          borderRadius="lg"
+          p={4}
+          bg="gray.50"
+          boxShadow="sm"
+          position="relative"
         >
-          <VStack spacing="3px">
+          <VStack spacing={4} align="stretch">
             {messages.length === 0 ? (
-              <Text textAlign="center" color="gray.500">
-                Explore locations easily with our AI bot. Just ask for cafes,
-                cultural spots, or peaceful getaways, and get instant
-                recommendations. It's that simple!
-              </Text>
+              <Center h="100%">
+                <Text textAlign="center" color="gray.600" fontSize="lg" fontWeight="light">
+                  Explore locations with our AI bot. Ask for cafes, cultural spots, or getaways and get instant recommendations.
+                </Text>
+              </Center>
             ) : (
               messages.map((msg, index) => (
                 <HStack
                   key={index}
                   justify={msg.sender === "user" ? "flex-end" : "flex-start"}
-                  w="100%"
+                  spacing={4}
                 >
-                  <Text
-                    bg={msg.sender === "user" ? "yellow.200" : "gray.100"}
-                    borderColor={COLORS.primaryColor}
+                  <Box
+                    p={3}
                     borderRadius="md"
-                    p={2}
                     maxW="75%"
+                    bg={msg.sender === "user" ? primaryColor : "white"}
+                    color={msg.sender === "user" ? "white" : darkPrimaryColor}
+                    borderWidth="1px"
+                    borderColor={msg.sender === "user" ? primaryColor : "gray.200"}
+                    boxShadow="md"
+                    transition="background-color 0.3s, transform 0.3s"
+                    _hover={{ 
+                      bg: msg.sender === "user" ? lightPrimaryColor : "gray.100",
+                      transform: "scale(1.02)"
+                    }}
                   >
                     {msg.text}
-                  </Text>
+                  </Box>
                 </HStack>
               ))
             )}
           </VStack>
         </Box>
-        <HStack w="100%">
+        <HStack spacing={4} w="100%">
           <Input
-            border="2px"
-            borderColor={COLORS.primaryColor}
+            borderWidth="1px"
+            borderColor="gray.200"
             borderRadius="md"
-            placeholder="Message..."
+            placeholder="Type your message..."
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
+            bg="white"
+            _placeholder={{ color: "gray.500" }}
+            transition="border-color 0.3s, box-shadow 0.3s"
+            _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
           />
           <Button
-            border="1px"
-            borderColor={COLORS.primaryColor}
-            backgroundColor={COLORS.primaryColor}
+            borderWidth="1px"
+            borderColor="gray.200"
+            backgroundColor={primaryColor}
+            color="white"
             borderRadius="md"
             onClick={sendMessage}
+            _hover={{ bg: "rgba(223, 81, 115, 0.8)" }}
+            _active={{ bg: "rgba(223, 81, 115, 0.9)" }}
+            transition="background-color 0.3s"
           >
             Send
           </Button>
