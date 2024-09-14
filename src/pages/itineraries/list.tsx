@@ -55,8 +55,11 @@ import dayjs from "dayjs";
 import { getActivityColor, supabaseClient } from "../../utility";
 import DropBox from "../../components/dropbox";
 import AddBillManually from "./AddExpenseModal";
+import PhotoGallery from "../../components/photo-gallery/PhotoGallery";
+import { Center } from '@chakra-ui/react'
 
 export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
+  const [activeTab, setActiveTab] = useState<string>('');
   const [inviteOpen, setInviteOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chats, setChats] = useState<any>([]);
@@ -175,7 +178,7 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
   const showdropbox = () => {
     setdropbox(!dropbox);
   };
-
+  
   return (
     <List
       title={<Heading size="lg">{projectData?.data?.[0]?.title}</Heading>}
@@ -297,6 +300,11 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
           >
             Expenses
           </Tab>
+          <Tab
+            color={COLORS.primaryColor}
+            onClick={() => {setActiveTab('imageGallery');}}>
+            Image Gallery
+          </Tab>
         </TabList>
 
         <TabPanels overflowX={"auto"}>
@@ -319,6 +327,18 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
             userId={user?.id}
           />
           <BillTabPanel list={bills} userId={user?.id} />
+          <TabPanel>
+            {activeTab === 'imageGallery' && (
+              <div>
+                {/* Your image gallery component or code here */}
+                <Center h='100px' color='black'>
+                  <Text as='b' fontSize='40px' color='black'>Image Gallery</Text>
+                </Center>
+                <PhotoGallery />
+                
+              </div>
+            )}
+        </TabPanel>
         </TabPanels>
       </Tabs>
       <InviteModal

@@ -11,14 +11,18 @@ import {
   AlertDescription,
 } from "@chakra-ui/react";
 
-const ImageUpload = ({ bucket_name, handleUpload }) => {
-  // Accept projectId and a callback as props
-  const { params } = useParsed();
-  const [imageSrc, setImageSrc] = useState(null);
-  const [uploadBtn, setUploadBtn] = useState(true);
-  const [imageFile, setImageFile] = useState(null);
+interface ImageUploadProps {
+  project_id: string;
+  type: string; // Add the type property
+}
 
-  const onDrop = useCallback((acceptedFiles) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ project_id, type }) => {  // Accept projectId and a callback as props
+  const { params } = useParsed();
+  const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
+  const [uploadBtn, setUploadBtn] = useState(true)
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
       const reader = new FileReader();
@@ -38,9 +42,19 @@ const ImageUpload = ({ bucket_name, handleUpload }) => {
     maxFiles: 1,
   });
 
-  function base64ToFile(base64, filename) {
+
+  let pathName = '';
+  if(type === "edit"){
+    pathName = `images/${project_id}`;
+  } else if(type === "gallery"){
+    pathName = `gallery/${project_id}`;
+  }
+
+  function base64ToFile(base64: string, filename: string) {
     const arr = base64.split(",");
-    const mime = arr[0].match(/:(.*?);/)[1];
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : '';
+
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
@@ -50,17 +64,13 @@ const ImageUpload = ({ bucket_name, handleUpload }) => {
     return new File([u8arr], filename, { type: mime });
   }
 
-  const uploadImageToSupabase = async (imageSrc, filename) => {
-    // Convert the base64-encoded image to a File object
+  async function uploadImageToSupabase(imageSrc: string, filename: string) {
     const file = base64ToFile(imageSrc, filename);
 
-    // Sanitize the filename by replacing characters that aren't letters, numbers, '.', or '-'
-    const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, "_");
-
-    // Upload the file to Supabase storage within the specified bucket and folder
+    const sanitizedFilename = filename.replace(/\s+/g, "_");
     const { data, error } = await supabaseClient.storage
-      .from("project-img") // Use the bucket_name here to specify the bucket
-      .upload(`${bucket_name}/${sanitizedFilename}`, file);
+      .from("project-img")
+      .upload(`${pathName}/${sanitizedFilename}`, file);
 
     console.log(data, error); // Debugging log
 
@@ -81,33 +91,31 @@ const ImageUpload = ({ bucket_name, handleUpload }) => {
     return fullPath;
   };
 
-  // const handleUpload = async () => {
-  //   if (imageSrc && imageFile) {
-  //     console.log("Uploading image to Supabase...", imageFile.name);
-  //     const filename = `${Date.now()}-${imageFile.name}`;
-  //     const imageUrl = await uploadImageToSupabase(imageSrc, filename);
-  //     if (imageUrl) {
-  //       console.log("Image uploaded to Supabase:", imageUrl);
-  //       console.log(params);
+  const handleUpload = async () => {
+    if (imageSrc && imageFile) {
+      const filename = `${Date.now()}-${imageFile.name}`;
+      const imageUrl = await uploadImageToSupabase(imageSrc as string, filename);
+      if (imageUrl) {
+        if(type === "edit"){
+          // Insert the full path into the image_link column of your database
+          const { data, error } = await supabaseClient
+            .from("projects") // Assuming your table is named 'projects'
+            .update({ image_link: imageUrl }) // Update the image_link column
+            .eq("id", params?.id); // Update the row where id matches projectId
+            if (error) {
+              console.error("Error updating image link in database:", error.message);
+            } else {
+              console.log("Image link updated in database:", data);
+              setImageSrc(null);
+              
+            }
+        } else if(type === "gallery"){
+          setImageSrc(null);
+        }
 
-  //       // Insert the full path into the image_link column of your database
-  //       const { data, error } = await supabaseClient
-  //         .from("projects") // Assuming your table is named 'projects'
-  //         .update({ image_link: imageUrl }) // Update the image_link column
-  //         .eq("id", params?.id); // Update the row where id matches projectId
-
-  //       if (error) {
-  //         console.error(
-  //           "Error updating image link in database:",
-  //           error.message
-  //         );
-  //       } else {
-  //         console.log("Image link updated in database:", data);
-  //         setUploadBtn(false);
-  //       }
-  //     }
-  //   }
-  // };
+      }
+    }
+  };
 
   return (
     <Box p={4}>
@@ -133,28 +141,17 @@ const ImageUpload = ({ bucket_name, handleUpload }) => {
       </Box>
       {imageSrc && uploadBtn && (
         <Box mt={4}>
-          <Image src={imageSrc} alt="Uploaded image" maxH="300px" />
+          <Text>Preview:</Text>
+          <Image src={typeof imageSrc === 'string' ? imageSrc : undefined} alt="Uploaded image" maxH="300px" />
+
         </Box>
       )}
-      {uploadBtn && imageSrc && (
-        <Box mt={4}>
-          <Button
-            mt={4}
-            colorScheme="blue"
-            onClick={() =>
-              handleUpload(
-                imageSrc,
-                imageFile,
-                uploadImageToSupabase,
-                supabaseClient,
-                setUploadBtn
-              )
-            }
-          >
-            Upload
-          </Button>
-        </Box>
-      )}
+      <Box mt={4}>
+        <Button mt={4} colorScheme="blue" onClick={handleUpload} isDisabled={!imageSrc}  >
+          Upload
+        </Button>
+      </Box>
+      
     </Box>
   );
 };

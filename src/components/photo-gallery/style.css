@@ -1,0 +1,18 @@
+.gallery{
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
+    -webkit-column-width:33%;
+    -moz-column-width: 33%;
+    column-width: 33X;
+    padding: 0 12px;
+}
+
+.pics{
+    margin-bottom: 10px;
+}
+.upload-button{
+    position: absolute; /* Position the button absolutely */
+    top: 50px; /* Adjust the top position as needed */
+    right: 10px;
+}

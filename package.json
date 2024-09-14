@@ -8,7 +8,9 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@esbuild/linux-x64": "^0.23.1",
     "@fontsource/catamaran": "^5.0.20",
+    "@react-google-maps/api": "^2.19.3",
     "@refinedev/chakra-ui": "^2.20.0",
     "@refinedev/cli": "^2.16.21",
     "@refinedev/core": "^4.47.1",
@@ -36,6 +38,7 @@
     "react-i18next": "^14.1.2",
     "react-icons": "^5.3.0",
     "react-jwt": "^1.2.1",
+    "react-photo-gallery": "^8.0.0",
     "react-router-dom": "^6.24.1",
     "snippet": "^0.1.0"
   },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { IResourceComponentsProps, useNavigation } from "@refinedev/core";
+import { IResourceComponentsProps, useNavigation, useParsed } from "@refinedev/core";
 import { DateField, Edit } from "@refinedev/chakra-ui";
 import {
   FormControl,
@@ -18,6 +18,9 @@ import dayjs from "dayjs";
 import ImageUpload from "../../components/image-upload";
 
 export const ProjectEdit: React.FC<IResourceComponentsProps> = () => {
+  const params = useParsed();
+  const project_id = params.id;
+  console.log(project_id);
   const {
     refineCore: { formLoading, queryResult },
     register,
@@ -57,7 +60,7 @@ export const ProjectEdit: React.FC<IResourceComponentsProps> = () => {
         </FormControl>
         <FormControl mb="3" isInvalid={!!(errors as any)?.image_link}>
           <FormLabel>Project Image</FormLabel>
-          <ImageUpload />
+          <ImageUpload project_id={String(project_id ?? "")} type="edit"/>
         </FormControl>
         <FormControl mb="3" isInvalid={!!(errors as any)?.destination}>
           <FormLabel>Destination</FormLabel>
