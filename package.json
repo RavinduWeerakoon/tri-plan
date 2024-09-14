@@ -8,6 +8,7 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@esbuild/linux-x64": "^0.23.1",
     "@fontsource/catamaran": "^5.0.20",
     "@react-google-maps/api": "^2.19.3",
     "@refinedev/chakra-ui": "^2.20.0",
