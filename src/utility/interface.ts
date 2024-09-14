@@ -5,6 +5,16 @@ export interface IUser {
   email: String;
 }
 
+export interface IBill {
+  id: BaseKey | number | string | undefined;
+  price: number;
+  description: string;
+  time: string;
+  items: { [key: string]: number };
+  project_id: number;
+  added_user: { id: number; email: string };
+}
+
 export interface IProject {
   title: String;
   start_date: string | number | Date | null;

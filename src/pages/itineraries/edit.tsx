@@ -292,14 +292,19 @@ export const ItineraryEdit: React.FC<IResourceComponentsProps> = () => {
         <Text as="b">Media Links</Text>
         <Flex alignItems={"center"} gap={5} my={4}>
           {itinerariesData?.media_url?.length > 0 &&
-            itinerariesData?.media_url.map((url: string) => (
-              <Flex alignItems={"center"}>
-                <IconPaperclip size={16} color={COLORS.greyNeutral500} />
-                <Link color="teal.500" href={url} target="_blank" mx={2}>
-                  {url.substring(0, 30) + "..."}
-                </Link>
-              </Flex>
-            ))}
+            itinerariesData?.media_url.map(
+              (url: string) => (
+                console.log(url),
+                (
+                  <Flex alignItems={"center"}>
+                    <IconPaperclip size={16} color={COLORS.greyNeutral500} />
+                    <Link color="teal.500" href={url} target="_blank" mx={2}>
+                      {url.substring(0, 30) + "..."}
+                    </Link>
+                  </Flex>
+                )
+              )
+            )}
         </Flex>
         <Flex alignItems={"center"} gap={4} mt={2}>
           <FormControl isInvalid={!!(errors as any)?.location}>
@@ -320,9 +325,7 @@ export const ItineraryEdit: React.FC<IResourceComponentsProps> = () => {
             Add attachments
           </Button>
         </Flex>
-
         <Divider my={4} />
-
         <FormControl mb="3" isInvalid={!!(errors as any)?.notes}>
           <FormLabel>Description</FormLabel>
 

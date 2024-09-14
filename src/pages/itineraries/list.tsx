@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   IResourceComponentsProps,
   useParsed,
@@ -7,6 +7,7 @@ import {
   useUpdate,
   useGetIdentity,
   useMany,
+  useList,
 } from "@refinedev/core";
 import { useNavigate } from "react-router-dom";
 import {
@@ -36,6 +37,7 @@ import {
   Heading,
   Button,
   TagLabel,
+  Box,
 } from "@chakra-ui/react";
 import { COLORS } from "../../utility/colors";
 import { IItinerary, IProject, IUser } from "../../utility/interface";
@@ -50,11 +52,14 @@ import { ITINERARY_STATUS } from "../../utility/constants";
 import Chat from "../../components/chat/chat";
 import dayjs from "dayjs";
 import { getActivityColor } from "../../utility";
-
+import ImageUpload from "../../components/image-upload";
 export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chats, setChats] = useState<any>([]);
+  const [bills, setbills] = useState<any>([]);
+  const [activeTab, setActiveTab] = useState("All Items");
+  const [dropbox, setdropbox] = useState(false);
 
   const { mutate } = useUpdate<HttpError>();
   const { params } = useParsed();
@@ -75,7 +80,26 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
       defaultBehavior: "replace",
     },
   });
+
   const [ids] = useState([params?.projectId]);
+
+  const { data: billData } = useList<HttpError>({
+    resource: "bills",
+    pagination: {
+      mode: "off",
+    },
+  });
+
+  useEffect(() => {
+    if (billData) {
+      const _bills = billData?.data?.filter((bill: any) => {
+        if (bill?.project_id === Number(params?.projectId)) {
+          return bill;
+        }
+      });
+      setbills(_bills);
+    }
+  }, [billData, params?.projectId]);
 
   const { data: projectData } = useMany<IProject, HttpError>({
     resource: "projects",
@@ -134,9 +158,80 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
   //   return document.URL + "/invite/" + user?.id + "/" + params?.projectId;
   // };
   const getInviteUrl = () => {
+    return `${window.location.origin}/projects/invite/${user?.id}/${params?.projectId}`;
+  };
 
-    return  `${window.location.origin}/projects/invite/${user?.id}/${params?.projectId}`;
+  const showdropbox = () => {
+    setdropbox(!dropbox);
+  };
 
+  const handleImageUpload = async (
+    imageSrc,
+    imageFile,
+    uploadImageToSupabase,
+    supabaseClient,
+    setUploadBtn
+  ) => {
+    if (imageSrc && imageFile) {
+      console.log("Uploading image to Supabase...", imageFile.name);
+      const filename = `${Date.now()}-${imageFile.name}`;
+      const imageUrl = await uploadImageToSupabase(imageSrc, filename);
+
+      if (imageUrl) {
+        console.log("Image uploaded to Supabase:", imageUrl);
+
+        const formData = new FormData();
+        formData.append("file", imageFile);
+        try {
+          const response = await fetch(
+            "http://139.59.15.179:8000/extract-info/",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+          const data = await response.json();
+
+          if (response.ok) {
+            console.log("Image successfully processed by API:", data);
+
+            const { date, amount, time, items } = data;
+
+            const added_user = {
+              id: user?.id,
+              email: user?.email,
+            };
+            const { error } = await supabaseClient.from("bills").insert([
+              {
+                date: date || new Date().toISOString().split("T")[0],
+                price: amount || 0,
+                description: "No description",
+                time: time,
+                items: items || [],
+                project_id: params?.projectId,
+                added_user: added_user,
+                Bill_link: imageUrl,
+              },
+            ]);
+            if (error) {
+              console.error(
+                "Error inserting bill data into Supabase:",
+                error.message
+              );
+            } else {
+              console.log("Bill data successfully inserted into Supabase!");
+              setUploadBtn(false);
+            }
+          } else {
+            console.error("Error :", data);
+          }
+        } catch (error) {
+          console.error("Error while sending:", error);
+        }
+
+        setUploadBtn(false);
+      }
+    }
   };
 
   return (
@@ -163,7 +258,7 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
           >
             Add itinerary item
           </Button>
-          {activeConfirmedTab.length > 0 && (
+          {activeTab === "Confirmed" && activeConfirmedTab.length > 0 && (
             <Button
               leftIcon={<IconLocation />}
               colorScheme="pink"
@@ -171,6 +266,16 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
               onClick={() => navigate(`/final-plan/${params?.projectId}`)}
             >
               View Final Plan
+            </Button>
+          )}
+          {activeTab === "Bills" && (
+            <Button
+              bg={COLORS.primaryColor}
+              leftIcon={<IconPlus />}
+              onClick={showdropbox}
+              color={COLORS.white}
+            >
+              Add Bill
             </Button>
           )}
         </>
@@ -181,6 +286,7 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
           <Tab
             color={COLORS.primaryColor}
             onClick={() => {
+              setActiveTab("All Items");
               setFilters([]);
               navigate(`/${params?.projectId}/itinerary`);
             }}
@@ -189,35 +295,49 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
           </Tab>
           <Tab
             color={COLORS.primaryColor}
-            onClick={() =>
+            onClick={() => {
+              setActiveTab("Confirmed");
               setFilters([
                 {
                   field: "status",
                   operator: "eq",
                   value: ITINERARY_STATUS.CONFIRMED,
                 },
-              ])
-            }
+              ]);
+            }}
           >
             Confirmed
           </Tab>
           <Tab
             color={COLORS.primaryColor}
-            onClick={() =>
+            onClick={() => {
+              setActiveTab("Canceled");
               setFilters([
                 {
                   field: "status",
                   operator: "eq",
                   value: ITINERARY_STATUS.CANCELED,
                 },
-              ])
-            }
+              ]);
+            }}
           >
             Canceled
           </Tab>
+          <Tab
+            color={COLORS.primaryColor}
+            onClick={() => setActiveTab("Bills")}
+          >
+            Bills
+          </Tab>
         </TabList>
+        {activeTab === "Bills" && dropbox && (
+          <ImageUpload
+            bucket_name="bill-image"
+            handleUpload={handleImageUpload}
+          />
+        )}
 
-        <TabPanels>
+        <TabPanels overflowX={"auto"}>
           <ItineraryTabPanel
             list={sortedProjectItineraries}
             handleLikes={handleLikes}
@@ -236,6 +356,7 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
             handleStatusChange={handleStatusChange}
             userId={user?.id}
           />
+          <BillTabPanel list={bills} userId={user?.id} />
         </TabPanels>
       </Tabs>
       <InviteModal
@@ -271,6 +392,83 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
   );
 };
 
+const BillTabPanel = ({ list, userId }: { list: any; userId: any }) => {
+  const navigate = useNavigate();
+
+  const handleBillEdit = (id: any) => {
+    console.log("id", id);
+    navigate(`/bills/edit/${id}`);
+  };
+  return (
+    <TabPanel padding={"unset"} pt={4} width={"100%"}>
+      <TableContainer
+        whiteSpace="pre-line"
+        overflowX={{ base: "scroll", sm: "auto" }}
+      >
+        <Table variant="simple">
+          <Thead bg={COLORS.lightGrey}>
+            <Tr>
+              <Th>Date</Th>
+              <Th>Time</Th>
+              <Th>Description</Th>
+              <Th>Price</Th>
+              <Th>Items</Th>
+              <Th>Actions</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {list.map((bill: any) => (
+              <Tr key={bill.id}>
+                <Td>
+                  <Text fontSize={"sm"}>
+                    {dayjs(bill.date).format("DD-MMM-YYYY")}
+                  </Text>
+                </Td>
+                <Td>
+                  <Text>{bill.time}</Text>
+                </Td>
+                <Td>
+                  <Text as="b">{bill.description}</Text>
+                </Td>
+                <Td>
+                  <Text>{bill.price.toFixed(2)}</Text>
+                </Td>
+                <Td>
+                  <Box>
+                    {Object.entries(bill.items).map(
+                      ([item, count]: [string, unknown]) => (
+                        <Text key={item}>{`${item}: ${count}`}</Text>
+                      )
+                    )}
+                  </Box>
+                </Td>
+                {userId === bill.added_user.id ? (
+                  <Td>
+                    <Flex gap={2}>
+                      <EditButton
+                        recordItemId={bill.id}
+                        hideText
+                        onClick={() => {
+                          handleBillEdit(bill.id);
+                        }}
+                      />
+                      <DeleteButton recordItemId={bill.id} hideText />
+                    </Flex>
+                  </Td>
+                ) : (
+                  <Td>
+                    <ShowButton recordItemId={bill.id} hideText />
+                  </Td>
+                )}
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </TabPanel>
+  );
+};
+
 const ItineraryTabPanel = ({
   list,
   handleLikes,
@@ -283,8 +481,11 @@ const ItineraryTabPanel = ({
   userId?: any;
 }) => {
   return (
-    <TabPanel padding={"unset"} pt={4}>
-      <TableContainer whiteSpace="pre-line">
+    <TabPanel padding={"unset"} pt={4} width={"100%"}>
+      <TableContainer
+        whiteSpace="pre-line"
+        overflowX={{ base: "scroll", sm: "auto" }}
+      >
         <Table variant="simple">
           <Thead bg={COLORS.lightGrey}>
             <Tr>

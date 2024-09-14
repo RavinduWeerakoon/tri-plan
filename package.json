@@ -6,8 +6,8 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "@fontsource/catamaran": "^5.0.20",
     "@refinedev/chakra-ui": "^2.20.0",
     "@refinedev/cli": "^2.16.21",
@@ -21,8 +21,11 @@
     "@tabler/icons": "^3.14.0",
     "@tabler/icons-react": "^3.10.0",
     "@tanstack/react-table": "^8.2.6",
+    "add": "^2.0.6",
+    "chakra": "^0.0.3",
     "dayjs": "^1.11.11",
-    "framer-motion": "^11.3.2",
+    "file-upload": "^0.0.0",
+    "framer-motion": "^11.5.4",
     "i18next": "^23.11.5",
     "i18next-browser-languagedetector": "^8.0.0",
     "i18next-xhr-backend": "^3.2.2",
@@ -33,7 +36,8 @@
     "react-i18next": "^14.1.2",
     "react-icons": "^5.3.0",
     "react-jwt": "^1.2.1",
-    "react-router-dom": "^6.24.1"
+    "react-router-dom": "^6.24.1",
+    "snippet": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.16.2",

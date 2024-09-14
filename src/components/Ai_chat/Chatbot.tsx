@@ -34,24 +34,22 @@ const Chatbot: React.FC = () => {
 
   // Dummy response generator
   const generateResponse = async (question: string) => {
-
-    const url = `http://139.59.15.179:3030/chat/`
+    const url = `http://139.59.15.179:3030/chat/`;
 
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: question})
+      body: JSON.stringify({ message: question }),
     });
 
-    return response.json(); 
-
+    return response.json();
   };
 
   // Handle user input submission
   const handleSend = async () => {
-    if (inputValue.trim() === '') return;
+    if (inputValue.trim() === "") return;
     const response = await generateResponse(inputValue);
     setMessages([...messages, { question: inputValue, response }]);
     setInputValue("");
@@ -63,7 +61,10 @@ const Chatbot: React.FC = () => {
       <Flex
         direction="column"
         justifyContent="space-between"
-        p="50px 20px 10px 100px"
+        marginTop={"20px"}
+        marginRight={"20px"}
+        marginLeft={{ base: "0", md: "100px" }}
+        p="50px 20px 10px 0"
       >
         <HStack spacing={4} ml={4}>
           {" "}
@@ -103,7 +104,11 @@ const Chatbot: React.FC = () => {
                     <Text mt={2} fontWeight="bold" color="green.500">
                       Bot:
                     </Text>
-                    <div dangerouslySetInnerHTML={{ __html: msg.response["response"] }}></div>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: msg.response["response"],
+                      }}
+                    ></div>
 
                     <SimpleGrid columns={[1, 2, 3]} spacing={4} mt={4}>
                       {msg.response["suggested_places"].map((place, index) => (

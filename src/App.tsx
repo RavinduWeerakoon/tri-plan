@@ -23,6 +23,7 @@ import {
   ItineraryEdit,
   ItineraryList,
   ItineraryShow,
+  BillEdit,
 } from "./pages/itineraries";
 import { Landing } from "./pages/landing";
 import { Invite } from "./pages/projects/invite";
@@ -113,7 +114,11 @@ function App() {
                     )}
                     Sider={() => <CustomSidebar />}
                   >
-                    <Box ml={"28vh"}>
+                    <Box
+                      ml={{ base: "10vw", md: "13vw" }}
+                      width={{ base: "88vw", md: "83vw" }}
+                      alignItems={"center"}
+                    >
                       <Outlet />
                     </Box>
                   </ThemedLayoutV2>
@@ -122,7 +127,10 @@ function App() {
                 <Route
                   path="/home"
                   element={
-                    <Authenticated key="authenticated" fallback={<CatchAllNavigate to="/login" />}>
+                    <Authenticated
+                      key="authenticated"
+                      fallback={<CatchAllNavigate to="/login" />}
+                    >
                       <Home />
                     </Authenticated>
                   }
@@ -132,7 +140,7 @@ function App() {
                     index
                     element={
                       <Authenticated
-                      key = "authenticated"
+                        key="authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <Projects />
@@ -143,7 +151,7 @@ function App() {
                     path="create"
                     element={
                       <Authenticated
-                      key="authenticated"
+                        key="authenticated"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ProjectCreate />
@@ -204,6 +212,17 @@ function App() {
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ItineraryEdit />
+                      </Authenticated>
+                    }
+                  />
+                  <Route
+                    path="bills/edit/:id"
+                    element={
+                      <Authenticated
+                        key="authenticated"
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        <BillEdit />
                       </Authenticated>
                     }
                   />

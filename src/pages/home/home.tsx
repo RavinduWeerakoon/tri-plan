@@ -26,7 +26,6 @@ import PublicProjectModal from "../../components/public-project-modal";
 import { useNavigate } from "react-router-dom";
 import Chatbot from "../../components/Ai_chat/Chatbot";
 
-
 export function Home() {
   const { push } = useNavigation();
   const { data: user } = useGetIdentity<IUser>();
@@ -66,36 +65,38 @@ export function Home() {
         <Heading as="h4" size="md" py={6}>
           Welcome back, {user?.email}
         </Heading>
-        <Flex gap="4">
-          <Card height="180px">
-            <CardHeader>
-              <Text fontSize={"lg"} color={COLORS.greyNeutral500} as="b">
-                Your active projects
-              </Text>
-            </CardHeader>
-            <CardBody>
-              <Text fontSize={"4xl"} as="b">
-                {personalStash?.length || 0}
-              </Text>
-            </CardBody>
-          </Card>
+        <Flex gap="4" flexDirection={{ base: "column", md: "row" }}>
+          <Flex gap={4}>
+            <Card height="180px">
+              <CardHeader>
+                <Text fontSize={"lg"} color={COLORS.greyNeutral500} as="b">
+                  Your active projects
+                </Text>
+              </CardHeader>
+              <CardBody>
+                <Text fontSize={"4xl"} as="b">
+                  {personalStash?.length || 0}
+                </Text>
+              </CardBody>
+            </Card>
 
-          <Card
-            backgroundColor={COLORS.primaryColor}
-            color={"white"}
-            height="180px"
-            alignItems={"center"}
-            justifyContent={"center"}
-            padding={4}
-            flexWrap={"nowrap"}
-            flexDirection={"row"}
-            cursor={"pointer"}
-            fontSize={"lg"}
-            onClick={() => push("/projects/create")}
-          >
-            <IconPlus />
-            Create a new project
-          </Card>
+            <Card
+              backgroundColor={COLORS.primaryColor}
+              color={"white"}
+              height="180px"
+              alignItems={"center"}
+              justifyContent={"center"}
+              padding={4}
+              flexWrap={"nowrap"}
+              flexDirection={"row"}
+              cursor={"pointer"}
+              fontSize={"lg"}
+              onClick={() => push("/projects/create")}
+            >
+              <IconPlus />
+              Create a new project
+            </Card>
+          </Flex>
           <ChakraProvider>
             <Chatbot />
           </ChakraProvider>
