@@ -53,7 +53,7 @@ import { ITINERARY_STATUS } from "../../utility/constants";
 import Chat from "../../components/chat/chat";
 import dayjs from "dayjs";
 import { getActivityColor, supabaseClient } from "../../utility";
-import ImageUpload from "../../components/image-upload";
+import DropBox from "../../components/dropbox";
 import AddBillManually from "./AddExpenseModal";
 
 export const ItineraryList: React.FC<IResourceComponentsProps> = () => {

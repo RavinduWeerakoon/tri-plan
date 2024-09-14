@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  IResourceComponentsProps,
-  useNavigation,
-  useParsed,
-} from "@refinedev/core";
+import { IResourceComponentsProps, useNavigation } from "@refinedev/core";
 import { DateField, Edit } from "@refinedev/chakra-ui";
 import {
   FormControl,
@@ -44,40 +40,6 @@ export const ProjectEdit: React.FC<IResourceComponentsProps> = () => {
       setEndDate(dayjs(projectsData?.end_date).format("YYYY-MM-DD"));
   }, [projectsData]);
 
-  const handleUpload = async (
-    imageSrc,
-    imageFile,
-    uploadImageToSupabase,
-    supabaseClient,
-    setUploadBtn
-  ) => {
-    const { params } = useParsed();
-    if (imageSrc && imageFile) {
-      console.log("Uploading image to Supabase...", imageFile.name);
-      const filename = `${Date.now()}-${imageFile.name}`;
-      const imageUrl = await uploadImageToSupabase(imageSrc, filename);
-      if (imageUrl) {
-        console.log("Image uploaded to Supabase:", imageUrl);
-        console.log(params);
-
-        // Insert the full path into the image_link column of your database
-        const { data, error } = await supabaseClient
-          .from("projects") // Assuming your table is named 'projects'
-          .update({ image_link: imageUrl }) // Update the image_link column
-          .eq("id", params?.id); // Update the row where id matches projectId
-
-        if (error) {
-          console.error(
-            "Error updating image link in database:",
-            error.message
-          );
-        } else {
-          console.log("Image link updated in database:", data);
-          setUploadBtn(false);
-        }
-      }
-    }
-  };
   return (
     <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
       <Box py={4} px={8} marginLeft={{ base: "-10", md: "0" }}>
@@ -95,7 +57,7 @@ export const ProjectEdit: React.FC<IResourceComponentsProps> = () => {
         </FormControl>
         <FormControl mb="3" isInvalid={!!(errors as any)?.image_link}>
           <FormLabel>Project Image</FormLabel>
-          <ImageUpload bucket_name={"images"} handleUpload={handleUpload} />
+          <ImageUpload />
         </FormControl>
         <FormControl mb="3" isInvalid={!!(errors as any)?.destination}>
           <FormLabel>Destination</FormLabel>

@@ -24,7 +24,7 @@ import { FaTrash } from "react-icons/fa";
 import { supabaseClient } from "../../utility";
 import { COLORS } from "../../utility/colors";
 import { IconPlus } from "@tabler/icons-react";
-import ImageUpload from "../../components/image-upload";
+import DropBox from "../../components/dropbox";
 import { useGetIdentity, useParsed } from "@refinedev/core";
 import { IUser } from "../../utility/interface";
 import { set } from "react-hook-form";
@@ -140,7 +140,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
     }
   };
 
-  const handleImageUpload = async (
+  const handleDropBox = async (
     imageSrc,
     imageFile,
     uploadImageToSupabase,
@@ -240,10 +240,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             Scan Bill
           </Button>
           {dropbox && (
-            <ImageUpload
-              bucket_name="bill-image"
-              handleUpload={handleImageUpload}
-            />
+            <DropBox bucket_name="bill-image" handleUpload={handleDropBox} />
           )}
 
           <form onSubmit={handleSubmit}>
