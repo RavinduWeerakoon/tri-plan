@@ -46,6 +46,7 @@ import { IUser } from "../../utility/interface";
 import { COLORS } from "../../utility/colors";
 
 export const ItineraryEdit: React.FC<IResourceComponentsProps> = () => {
+
   const {
     refineCore: { formLoading, queryResult },
     saveButtonProps,

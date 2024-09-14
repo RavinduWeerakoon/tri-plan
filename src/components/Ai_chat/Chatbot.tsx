@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   Box,
   Input,
@@ -18,6 +19,7 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
+
 
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<
@@ -58,7 +60,13 @@ const Chatbot: React.FC = () => {
     setModalOpen(true);
   };
 
+  // Define color shades
+  const primaryColor = "rgb(223, 81, 115)";
+  const lightPrimaryColor = "rgba(223, 81, 115, 0.2)"; // lighter shade of primary color
+  const darkPrimaryColor = "rgba(223, 81, 115, 0.8)"; // darker shade of primary color
+
   return (
+
     <>
       <Flex
         direction="column"

@@ -11,7 +11,12 @@ import {
   AlertDescription,
 } from '@chakra-ui/react'
 
-const ImageUpload = () => {  // Accept projectId and a callback as props
+interface ImageUploadProps {
+  project_id: string;
+  type: string; // Add the type property
+}
+
+const ImageUpload: React.FC<ImageUploadProps> = ({ project_id, type }) => {  // Accept projectId and a callback as props
   const { params } = useParsed();
   const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
   const [uploadBtn, setUploadBtn] = useState(true)
@@ -37,10 +42,19 @@ const ImageUpload = () => {  // Accept projectId and a callback as props
     maxFiles: 1,
   });
 
+
+  let pathName = '';
+  if(type === "edit"){
+    pathName = `images/${project_id}`;
+  } else if(type === "gallery"){
+    pathName = `gallery/${project_id}`;
+  }
+
   function base64ToFile(base64: string, filename: string) {
     const arr = base64.split(",");
-    const matchResult = arr[0].match(/:(.*?);/);
-    const mime = matchResult ? matchResult[1] : '';
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : '';
+
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
@@ -50,12 +64,13 @@ const ImageUpload = () => {  // Accept projectId and a callback as props
     return new File([u8arr], filename, { type: mime });
   }
 
-  async function uploadImageToSupabase(imageSrc: string | ArrayBuffer, filename: string) {
-    const file = base64ToFile(imageSrc as string, filename);
+  async function uploadImageToSupabase(imageSrc: string, filename: string) {
+    const file = base64ToFile(imageSrc, filename);
+
     const sanitizedFilename = filename.replace(/\s+/g, "_");
     const { data, error } = await supabaseClient.storage
       .from("project-img")
-      .upload(`images/${sanitizedFilename}`, file);
+      .upload(`${pathName}/${sanitizedFilename}`, file);
 
     if (error) {
       console.error("Error uploading file:", error.message);
@@ -70,24 +85,25 @@ const ImageUpload = () => {  // Accept projectId and a callback as props
   const handleUpload = async () => {
     if (imageSrc && imageFile) {
       const filename = `${Date.now()}-${imageFile.name}`;
-      const imageUrl = await uploadImageToSupabase(imageSrc, filename);
+      const imageUrl = await uploadImageToSupabase(imageSrc as string, filename);
       if (imageUrl) {
-        console.log("Image uploaded to Supabase:", imageUrl);
-        console.log(params);
-
-        // Insert the full path into the image_link column of your database
-        const { data, error } = await supabaseClient
-          .from("projects") // Assuming your table is named 'projects'
-          .update({ image_link: imageUrl }) // Update the image_link column
-          .eq("id", params?.id); // Update the row where id matches projectId
-
-        if (error) {
-          console.error("Error updating image link in database:", error.message);
-        } else {
-          console.log("Image link updated in database:", data);
-          setUploadBtn(false);
-          
+        if(type === "edit"){
+          // Insert the full path into the image_link column of your database
+          const { data, error } = await supabaseClient
+            .from("projects") // Assuming your table is named 'projects'
+            .update({ image_link: imageUrl }) // Update the image_link column
+            .eq("id", params?.id); // Update the row where id matches projectId
+            if (error) {
+              console.error("Error updating image link in database:", error.message);
+            } else {
+              console.log("Image link updated in database:", data);
+              setImageSrc(null);
+              
+            }
+        } else if(type === "gallery"){
+          setImageSrc(null);
         }
+
       }
     }
   };
@@ -117,17 +133,16 @@ const ImageUpload = () => {  // Accept projectId and a callback as props
       {imageSrc && (
         <Box mt={4}>
           <Text>Preview:</Text>
-          <Image src={imageSrc as string} alt="Uploaded image" maxH="300px" />
+          <Image src={typeof imageSrc === 'string' ? imageSrc : undefined} alt="Uploaded image" maxH="300px" />
 
         </Box>
       )}
-      {uploadBtn && imageSrc && (
-        <Box mt={4}>
-                      <Button mt={4} colorScheme="blue" onClick={handleUpload}>
-            Upload
-          </Button>
-        </Box>
-      )}
+      <Box mt={4}>
+        <Button mt={4} colorScheme="blue" onClick={handleUpload} isDisabled={!imageSrc}  >
+          Upload
+        </Button>
+      </Box>
+      
     </Box>
   );
 };
