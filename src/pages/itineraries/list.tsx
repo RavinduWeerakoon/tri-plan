@@ -395,35 +395,35 @@ const BillTabPanel = ({ list, userId }: { list: any; userId: any }) => {
 
   const [collaboratorCount, setCollaboratorCount] = useState<number>(3);
 
-  const fetchProjectById = async (projectId: string | undefined) => {
-    const { data, error } = await supabaseClient
-      .from("projects")
-      .select("collaborators") // Only select the 'collaborators' column
-      .eq("id", projectId);
+  // const fetchProjectById = async (projectId: string | undefined) => {
+  //   const { data, error } = await supabaseClient
+  //     .from("projects")
+  //     .select("collaborators") // Only select the 'collaborators' column
+  //     .eq("id", projectId);
 
-    if (error) {
-      console.error("Error fetching project:", error);
-      return null;
-    }
+  //   if (error) {
+  //     console.error("Error fetching project:", error);
+  //     return null;
+  //   }
 
-    if (data && data.length > 0) {
-      const collaborators = data[0].collaborators; // Assuming the first record is the desired one
-      const collaboratorsCount = collaborators ? collaborators.length : 0; // Check if collaborators exist and get the length
-      console.log("Number of collaborators:", collaboratorsCount);
-      return collaboratorsCount;
-    }
+  //   if (data && data.length > 0) {
+  //     const collaborators = data[0].collaborators; // Assuming the first record is the desired one
+  //     const collaboratorsCount = collaborators ? collaborators.length : 0; // Check if collaborators exist and get the length
+  //     console.log("Number of collaborators:", collaboratorsCount);
+  //     return collaboratorsCount;
+  //   }
 
-    return 0;
-  };
-  useEffect(() => {
-    const params = useParams();
-    const fetchCollaboratorCount = async () => {
-      const count = await fetchProjectById(params?.projectId);
-      setCollaboratorCount(count || 1);
-    };
+  //   return 0;
+  // };
+  // useEffect(() => {
+  //   const params = useParams();
+  //   const fetchCollaboratorCount = async () => {
+  //     const count = await fetchProjectById(params?.projectId);
+  //     setCollaboratorCount(count || 1);
+  //   };
 
-    fetchCollaboratorCount();
-  }, []);
+  //   fetchCollaboratorCount();
+  // }, []);
 
   return (
     <TabPanel padding={"unset"} pt={4} width={"100%"}>

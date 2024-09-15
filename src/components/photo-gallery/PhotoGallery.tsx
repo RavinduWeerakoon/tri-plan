@@ -59,8 +59,17 @@ const PhotoGallery = () => {
 
   return (
     <div>
+      <div className="gallery">
+        {photos.map((items) => {
+          return (
+            <div className="pics">
+              <img src={items.src} style={{ width: "100%" }} />
+            </div>
+          );
+        })}
+      </div>
       <div className="upload-button">
-        <Button onClick={onOpen} colorScheme="blue">
+        <Button onClick={onOpen} colorScheme="blue" marginTop={20}>
           Upload
         </Button>
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -77,15 +86,6 @@ const PhotoGallery = () => {
             </ModalFooter>
           </ModalContent>
         </Modal>
-      </div>
-      <div className="gallery">
-        {photos.map((items) => {
-          return (
-            <div className="pics">
-              <img src={items.src} style={{ width: "100%" }} />
-            </div>
-          );
-        })}
       </div>
     </div>
   );
