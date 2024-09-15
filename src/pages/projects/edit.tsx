@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { IResourceComponentsProps, useNavigation, useParsed } from "@refinedev/core";
+import {
+  IResourceComponentsProps,
+  useNavigation,
+  useParsed,
+} from "@refinedev/core";
 import { DateField, Edit } from "@refinedev/chakra-ui";
 import {
   FormControl,
@@ -15,7 +19,7 @@ import {
 import { useForm } from "@refinedev/react-hook-form";
 import { PROJECT_STATUS } from "../../utility/constants";
 import dayjs from "dayjs";
-import ImageUpload from "../../components/image-upload";
+import ImageUpload from "../../components/image-upload/ImageUpload";
 
 export const ProjectEdit: React.FC<IResourceComponentsProps> = () => {
   const params = useParsed();
@@ -60,7 +64,7 @@ export const ProjectEdit: React.FC<IResourceComponentsProps> = () => {
         </FormControl>
         <FormControl mb="3" isInvalid={!!(errors as any)?.image_link}>
           <FormLabel>Project Image</FormLabel>
-          <ImageUpload project_id={String(project_id ?? "")} type="edit"/>
+          <ImageUpload project_id={String(project_id ?? "")} type="edit" />
         </FormControl>
         <FormControl mb="3" isInvalid={!!(errors as any)?.destination}>
           <FormLabel>Destination</FormLabel>

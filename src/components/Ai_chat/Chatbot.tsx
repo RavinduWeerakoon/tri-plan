@@ -20,7 +20,6 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 
-
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<
     {
@@ -36,7 +35,7 @@ const Chatbot: React.FC = () => {
 
   // Dummy response generator
   const generateResponse = async (question: string) => {
-    const url = `http://139.59.15.179:3030/chat/`;
+    const url = `http://139.59.15.179:8000/chat/`;
 
     const response = await fetch(url, {
       method: "POST",
@@ -64,7 +63,6 @@ const Chatbot: React.FC = () => {
   const darkPrimaryColor = "rgba(223, 81, 115, 0.8)"; // darker shade of primary color
 
   return (
-
     <>
       <Flex
         direction="column"

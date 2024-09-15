@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from "react";
 import {
   HttpError,
   IResourceComponentsProps,
@@ -25,14 +25,19 @@ import { useNavigate } from "react-router-dom";
 import { IProject } from "../../utility/interface";
 import dayjs from "dayjs";
 import { IUser } from "../../utility/interface";
-import { GoogleMap, useJsApiLoader, MarkerF, Autocomplete } from '@react-google-maps/api';
+import {
+  GoogleMap,
+  useJsApiLoader,
+  MarkerF,
+  Autocomplete,
+} from "@react-google-maps/api";
 
 export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
   const defaultCenter = {
     lat: 6.927079,
-    lng: 79.861244  
+    lng: 79.861244,
   };
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState("");
   const [markerPosition, setMarkerPosition] = useState(defaultCenter);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
@@ -57,8 +62,12 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
     resource: "projects",
     ids,
   });
-  const itineraryMinStartDate = dayjs(data?.data?.[0]?.start_date).format("YYYY-MM-DD");
-  const itineraryMaxStartDate = dayjs(data?.data?.[0]?.end_date).format("YYYY-MM-DD");
+  const itineraryMinStartDate = dayjs(data?.data?.[0]?.start_date).format(
+    "YYYY-MM-DD"
+  );
+  const itineraryMaxStartDate = dayjs(data?.data?.[0]?.end_date).format(
+    "YYYY-MM-DD"
+  );
 
   const handleSubmitItineraryCreate = (values: any) => {
     onFinish({
@@ -72,39 +81,42 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
       },
     }).then(() => navigate(`/${params?.projectId}/itinerary`));
   };
-  const apiKey = process.env.VITE_REACT_APP_API_KEY || '';
+  const apiKey = process.env.VITE_REACT_APP_API_KEY || "";
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: apiKey,
     libraries: ["places"],
   });
 
   const containerStyle = {
-    width: '400px',
-    height: '400px',
-    borderRadius: '15px',
-    overflow: 'hidden',
+    width: "400px",
+    height: "400px",
+    borderRadius: "15px",
+    overflow: "hidden",
   };
 
-  const onLoadAutocomplete = useCallback((autocomplete: google.maps.places.Autocomplete) => {
-    autocompleteRef.current = autocomplete;
-    if (inputRef.current) {
-      autocomplete.setOptions({
-        types: ['geocode']
-      });
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (place.formatted_address) {
-          setLocation(place.formatted_address);
-          if (place.geometry && place.geometry.location) {
-            setMarkerPosition({
-              lat: place.geometry.location.lat(),
-              lng: place.geometry.location.lng(),
-            });
+  const onLoadAutocomplete = useCallback(
+    (autocomplete: google.maps.places.Autocomplete) => {
+      autocompleteRef.current = autocomplete;
+      if (inputRef.current) {
+        autocomplete.setOptions({
+          types: ["geocode"],
+        });
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (place.formatted_address) {
+            setLocation(place.formatted_address);
+            if (place.geometry && place.geometry.location) {
+              setMarkerPosition({
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng(),
+              });
+            }
           }
-        }
-      });
-    }
-  }, []);
+        });
+      }
+    },
+    []
+  );
 
   if (loadError) return <div>Error loading Google Maps script</div>;
   if (!isLoaded) return <div>Loading...</div>;
@@ -200,10 +212,9 @@ export const ItineraryCreate: React.FC<IResourceComponentsProps> = () => {
               mapTypeControl: false,
               fullscreenControl: false,
             }}
-            >
+          >
             <MarkerF position={markerPosition} />
           </GoogleMap>
-
         </Flex>
 
         <FormControl mb="3" isInvalid={!!(errors as any)?.media_url}>

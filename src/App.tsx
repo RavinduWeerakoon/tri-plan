@@ -23,7 +23,6 @@ import {
   ItineraryEdit,
   ItineraryList,
   ItineraryShow,
-  BillEdit,
 } from "./pages/itineraries";
 import { Landing } from "./pages/landing";
 import { Invite } from "./pages/projects/invite";
@@ -212,17 +211,6 @@ function App() {
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ItineraryEdit />
-                      </Authenticated>
-                    }
-                  />
-                  <Route
-                    path="bills/edit/:id"
-                    element={
-                      <Authenticated
-                        key="authenticated"
-                        fallback={<CatchAllNavigate to="/login" />}
-                      >
-                        <BillEdit />
                       </Authenticated>
                     }
                   />

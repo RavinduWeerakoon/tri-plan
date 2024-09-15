@@ -8,6 +8,7 @@ import {
   useGetIdentity,
   useMany,
   useList,
+  BaseKey,
 } from "@refinedev/core";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -56,10 +57,9 @@ import { getActivityColor, supabaseClient } from "../../utility";
 import DropBox from "../../components/dropbox";
 import AddBillManually from "./AddExpenseModal";
 import PhotoGallery from "../../components/photo-gallery/PhotoGallery";
-import { Center } from '@chakra-ui/react'
+import { Center } from "@chakra-ui/react";
 
 export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
-  const [activeTab, setActiveTab] = useState<string>('');
   const [inviteOpen, setInviteOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chats, setChats] = useState<any>([]);
@@ -87,7 +87,9 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
     },
   });
 
-  const [ids] = useState([params?.projectId]);
+  const [ids] = useState<BaseKey[]>(
+    [params?.projectId].filter(Boolean) as BaseKey[]
+  );
 
   const { data: billData } = useList<HttpError>({
     resource: "bills",
@@ -178,7 +180,7 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
   const showdropbox = () => {
     setdropbox(!dropbox);
   };
-  
+
   return (
     <List
       title={<Heading size="lg">{projectData?.data?.[0]?.title}</Heading>}
@@ -302,7 +304,10 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
           </Tab>
           <Tab
             color={COLORS.primaryColor}
-            onClick={() => {setActiveTab('imageGallery');}}>
+            onClick={() => {
+              setActiveTab("imageGallery");
+            }}
+          >
             Image Gallery
           </Tab>
         </TabList>
@@ -328,17 +333,18 @@ export const ItineraryList: React.FC<IResourceComponentsProps> = () => {
           />
           <BillTabPanel list={bills} userId={user?.id} />
           <TabPanel>
-            {activeTab === 'imageGallery' && (
+            {activeTab === "imageGallery" && (
               <div>
                 {/* Your image gallery component or code here */}
-                <Center h='100px' color='black'>
-                  <Text as='b' fontSize='40px' color='black'>Image Gallery</Text>
+                <Center h="100px" color="black">
+                  <Text as="b" fontSize="40px" color="black">
+                    Image Gallery
+                  </Text>
                 </Center>
                 <PhotoGallery />
-                
               </div>
             )}
-        </TabPanel>
+          </TabPanel>
         </TabPanels>
       </Tabs>
       <InviteModal
@@ -389,11 +395,11 @@ const BillTabPanel = ({ list, userId }: { list: any; userId: any }) => {
 
   const [collaboratorCount, setCollaboratorCount] = useState<number>(3);
 
-  const fetchProjectById = async () => {
+  const fetchProjectById = async (projectId: string | undefined) => {
     const { data, error } = await supabaseClient
       .from("projects")
       .select("collaborators") // Only select the 'collaborators' column
-      .eq("id", params?.projectId);
+      .eq("id", projectId);
 
     if (error) {
       console.error("Error fetching project:", error);
@@ -410,8 +416,9 @@ const BillTabPanel = ({ list, userId }: { list: any; userId: any }) => {
     return 0;
   };
   useEffect(() => {
+    const params = useParams();
     const fetchCollaboratorCount = async () => {
-      const count = await fetchProjectById();
+      const count = await fetchProjectById(params?.projectId);
       setCollaboratorCount(count || 1);
     };
 
@@ -454,11 +461,9 @@ const BillTabPanel = ({ list, userId }: { list: any; userId: any }) => {
                 </Td>
                 <Td>
                   <Box>
-                    {Object.entries(bill.items).map(
-                      ([item, count]: [string, unknown]) => (
-                        <Text key={item}>{`${item}`}</Text>
-                      )
-                    )}
+                    {bill.items.map((item: string, index: number) => (
+                      <Text key={index}>{item}</Text>
+                    ))}
                   </Box>
                 </Td>
                 {userId === bill.added_user.id ? (

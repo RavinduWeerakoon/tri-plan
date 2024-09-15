@@ -10,15 +10,25 @@ import {
   AlertTitle,
   AlertDescription,
 } from "@chakra-ui/react";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-const dropbox = ({ bucket_name, handleUpload }) => {
+const dropbox = (
+  { bucket_name }: { bucket_name: string },
+  handleUpload: (
+    imageSrc: string | ArrayBuffer,
+    arg1: null,
+    arg2: (imageSrc: any, filename: any) => Promise<string | null>,
+    arg3: SupabaseClient<any, "public", any>,
+    arg4: React.Dispatch<React.SetStateAction<boolean>>
+  ) => void
+) => {
   // Accept projectId and a callback as props
   const { params } = useParsed();
-  const [imageSrc, setImageSrc] = useState(null);
+  const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
   const [uploadBtn, setUploadBtn] = useState(true);
   const [imageFile, setImageFile] = useState(null);
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: any[]) => {
     const file = acceptedFiles[0];
     if (file) {
       const reader = new FileReader();
@@ -38,9 +48,10 @@ const dropbox = ({ bucket_name, handleUpload }) => {
     maxFiles: 1,
   });
 
-  function base64ToFile(base64, filename) {
+  function base64ToFile(base64: string, filename: string) {
     const arr = base64.split(",");
-    const mime = arr[0].match(/:(.*?);/)[1];
+    const matchResult = arr[0].match(/:(.*?);/);
+    const mime = matchResult ? matchResult[1] : undefined;
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
@@ -50,9 +61,12 @@ const dropbox = ({ bucket_name, handleUpload }) => {
     return new File([u8arr], filename, { type: mime });
   }
 
-  const uploadImageToSupabase = async (imageSrc, filename) => {
+  const uploadImageToSupabase = async (
+    imageSrc: string | ArrayBuffer | null,
+    filename: string
+  ) => {
     // Convert the base64-encoded image to a File object
-    const file = base64ToFile(imageSrc, filename);
+    const file = base64ToFile(imageSrc as string, filename);
 
     // Sanitize the filename by replacing characters that aren't letters, numbers, '.', or '-'
     const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, "_");
@@ -133,7 +147,7 @@ const dropbox = ({ bucket_name, handleUpload }) => {
       </Box>
       {imageSrc && uploadBtn && (
         <Box mt={4}>
-          <Image src={imageSrc} alt="Uploaded image" maxH="300px" />
+          <Image src={imageSrc.toString()} alt="Uploaded image" maxH="300px" />
         </Box>
       )}
       {uploadBtn && imageSrc && (

@@ -122,10 +122,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         .match({ Bill_link: Bill_link });
       console.error("Error inserting bill data into Supabase:", error?.message);
     } else {
-      <Alert status="success">
-        <AlertIcon />
-        Bill data successfully inserted into Database!
-      </Alert>;
+      setShowAlert(true);
       console.log("Bill data successfully inserted into Supabase!");
       setFormData({
         date: "",
@@ -141,15 +138,15 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   };
 
   const handleDropBox = async (
-    imageSrc,
-    imageFile,
-    uploadImageToSupabase,
-    supabaseClient,
-    setUploadBtn
+    imageSrc: any,
+    imageFile: string | Blob,
+    uploadImageToSupabase: (arg0: any, arg1: string) => any,
+    supabaseClient: any,
+    setUploadBtn: (arg0: boolean) => void
   ) => {
     if (imageSrc && imageFile) {
-      console.log("Uploading image to Supabase...", imageFile.name);
-      const filename = `${Date.now()}-${imageFile.name}`;
+      console.log("Uploading image to Supabase...", (imageFile as File).name);
+      const filename = `${Date.now()}-${(imageFile as File).name}`;
       const imageUrl = await uploadImageToSupabase(imageSrc, filename);
 
       if (imageFile) {
@@ -182,27 +179,6 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             }));
 
             setUploadBtn(false);
-            // const { error } = await supabaseClient.from("bills").insert([
-            //   {
-            //     date: date || new Date().toISOString().split("T")[0],
-            //     price: amount || 0,
-            //     description: "No description",
-            //     time: time,
-            //     items: items || [],
-            //     project_id: params?.projectId,
-            //     added_user: added_user,
-            //     Bill_link: imageUrl,
-            //   },
-            // ]);
-            // if (error) {
-            //   console.error(
-            //     "Error inserting bill data into Supabase:",
-            //     error.message
-            //   );
-            // } else {
-            //   console.log("Bill data successfully inserted into Supabase!");
-            //   setUploadBtn(false);
-            // }
           } else {
             console.error("Error :", data);
           }
@@ -218,107 +194,115 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
     }
   };
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
-      <ModalOverlay
-        bg="none"
-        backdropFilter="auto"
-        backdropInvert="80%"
-        backdropBlur="2px"
-      />
-      <ModalContent maxWidth={{ base: "100%", md: "500px" }}>
-        <ModalHeader>Add Expense</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Button
-            bg={COLORS.primaryColor}
-            leftIcon={<IconPlus />}
-            onClick={showdropbox}
-            color={COLORS.white}
-            marginBottom={4}
-          >
-            Scan Bill
-          </Button>
-          {dropbox && (
-            <DropBox bucket_name="bill-image" handleUpload={handleDropBox} />
-          )}
+  const [showAlert, setShowAlert] = useState(false);
 
-          <form onSubmit={handleSubmit}>
-            <FormControl mb={4}>
-              <FormLabel>Date</FormLabel>
-              <Input
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                type="date"
-              />
-            </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Price</FormLabel>
-              <Input
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                type="number"
-              />
-            </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Description</FormLabel>
-              <Input
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-              />
-            </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Time</FormLabel>
-              <Input
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-                type="time"
-              />
-            </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Items</FormLabel>
-              {formData.items.map((item, index) => {
-                return (
-                  <Stack key={index} spacing={3} mb={3}>
-                    <Stack direction="row" spacing={2} align="center">
-                      <Input
-                        placeholder="Item Name"
-                        value={item.name}
-                        onChange={(e) =>
-                          handleItemChange(index, "name", e.target.value)
-                        }
-                      />
-                      <IconButton
-                        aria-label="Remove Item"
-                        icon={<FaTrash />}
-                        onClick={() => removeItem(index)}
-                        variant="outline"
-                        colorScheme="red"
-                      />
-                    </Stack>
-                  </Stack>
-                );
-              })}
-              <Button mt={2} onClick={addItem} colorScheme="teal">
-                Add Item
-              </Button>
-            </FormControl>
-            <Button mt={4} colorScheme="blue" type="submit">
-              Submit
+  return (
+    <>
+      {showAlert && (
+        <Alert status="success">
+          <AlertIcon />
+          Bill data successfully inserted into Database!
+        </Alert>
+      )}
+      <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+        <ModalOverlay
+          bg="none"
+          backdropFilter="auto"
+          backdropInvert="80%"
+          backdropBlur="2px"
+        />
+        <ModalContent maxWidth={{ base: "100%", md: "500px" }}>
+          <ModalHeader>Add Expense</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Button
+              bg={COLORS.primaryColor}
+              leftIcon={<IconPlus />}
+              onClick={showdropbox}
+              color={COLORS.white}
+              marginBottom={4}
+            >
+              Scan Bill
             </Button>
-          </form>
-        </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
-            Close
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+            {dropbox && <DropBox bucket_name="bill-image" />}
+
+            <form onSubmit={handleSubmit}>
+              <FormControl mb={4}>
+                <FormLabel>Date</FormLabel>
+                <Input
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  type="date"
+                />
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Price</FormLabel>
+                <Input
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  type="number"
+                />
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Description</FormLabel>
+                <Input
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                />
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Time</FormLabel>
+                <Input
+                  name="time"
+                  value={formData.time}
+                  onChange={handleChange}
+                  type="time"
+                />
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Items</FormLabel>
+                {formData.items.map((item, index) => {
+                  return (
+                    <Stack key={index} spacing={3} mb={3}>
+                      <Stack direction="row" spacing={2} align="center">
+                        <Input
+                          placeholder="Item Name"
+                          value={item.name}
+                          onChange={(e) =>
+                            handleItemChange(index, "name", e.target.value)
+                          }
+                        />
+                        <IconButton
+                          aria-label="Remove Item"
+                          icon={<FaTrash />}
+                          onClick={() => removeItem(index)}
+                          variant="outline"
+                          colorScheme="red"
+                        />
+                      </Stack>
+                    </Stack>
+                  );
+                })}
+                <Button mt={2} onClick={addItem} colorScheme="teal">
+                  Add Item
+                </Button>
+              </FormControl>
+              <Button mt={4} colorScheme="blue" type="submit">
+                Submit
+              </Button>
+            </form>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 
