@@ -37,6 +37,9 @@ import "@fontsource/catamaran/700.css";
 
 function App() {
   const { t, i18n } = useTranslation();
+  useEffect(() => {
+    document.title = "Triplan";
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("chakra-ui-color-mode", "light");
