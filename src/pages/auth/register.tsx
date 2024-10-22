@@ -7,7 +7,7 @@ export function Register() {
   return (
     <AuthTemplate>
       <AuthPage
-        type="login"
+        type="register"
         title={
           <ThemedTitleV2 text="TriPlan" icon={<Logo />} collapsed={false} />
         }
